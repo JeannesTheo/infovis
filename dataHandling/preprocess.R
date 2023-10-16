@@ -12,9 +12,9 @@ library(stringr)
 filter_columns <- function() {
   print('Starting filters')
   setwd('datav1')
-  songs <- read.csv('songs.csv', header = TRUE, sep = ',', fill = TRUE, dec = '.')
-  albums <- read.csv('albums.csv', header = TRUE, sep = ',', fill = TRUE, dec = '.')
-  artists <- read.csv('artists.csv', header = TRUE, sep = ',', fill = TRUE, dec = '.')
+  songs <- read.csv('songs.csv', header = TRUE, sep = ',', fill = TRUE, dec = '..')
+  albums <- read.csv('albums.csv', header = TRUE, sep = ',', fill = TRUE, dec = '..')
+  artists <- read.csv('artists.csv', header = TRUE, sep = ',', fill = TRUE, dec = '..')
   print('Datas loaded')
   songs$artist_name <- songs$name
   songs <- songs[, c('X_id', 'id_album', 'artist_name', 'title', 'genre', 'rank', 'explicitLyrics', 'publicationDate', 'releaseDate')]
@@ -55,7 +55,7 @@ get_year <- function(x, y) {
 merging_dates <- function (input_file,save_file){
   setwd('datav1')
   print('Start merging dates')
-  songs <- read.csv(input_file, header = TRUE, sep = ',', fill = TRUE, dec = '.')
+  songs <- read.csv(input_file, header = TRUE, sep = ',', fill = TRUE, dec = '..')
   songs$year <- mapply(get_year, songs$publicationDate, songs$releaseDate)
   songs_a <- subset(songs, select = -c(releaseDate, publicationDate))
   write.csv(songs_a, save_file, row.names = FALSE)
@@ -66,7 +66,7 @@ merging_dates <- function (input_file,save_file){
 clearing_text <- function (input_file,save_file,field){
   setwd('datav1')
   print(paste('Start clearing',field))
-  data <- read.csv(input_file, header = TRUE, sep = ',', fill = TRUE, dec = '.')
+  data <- read.csv(input_file, header = TRUE, sep = ',', fill = TRUE, dec = '..')
   data <- data[!(data[[field]] == '' | is.na(data[[field]])), ]
   write.csv(data,save_file,row.names = FALSE)
   print('Done')
