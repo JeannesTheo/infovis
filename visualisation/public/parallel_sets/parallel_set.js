@@ -19,7 +19,7 @@ onload = function () {
             .attr("height", height)
             .attr("style", "max-width: 100%; height: auto;");
 
-        const { nodes, links } = sankey({
+        const {nodes, links} = sankey({
             nodes: graph.nodes.map(d => Object.create(d)),
             links: graph.links.map(d => Object.create(d))
         });
@@ -64,7 +64,7 @@ onload = function () {
         return svg.node();
     };
 
-    const createSankey = (data) => {
+    const graph = (data) => {
         const keys = data.columns.slice(0, -1);
         let index = -1;
         const nodes = [];
@@ -76,7 +76,7 @@ onload = function () {
             for (const d of data) {
                 const key = [k, d[k]];
                 if (!nodeByKey.has(JSON.stringify(key))) {
-                    const node = { name: d[k] };
+                    const node = {name: d[k]};
                     nodes.push(node);
                     nodeByKey.set(JSON.stringify(key), node);
                     indexByKey.set(JSON.stringify(key), ++index);
@@ -107,17 +107,14 @@ onload = function () {
             }
         }
 
-        return { nodes, links };
+        return {nodes, links};
     };
 
 // Example usage:
     const csvFilePath = "parallel_set_filtered.csv";
-    d3.csv(csvFilePath)
-        .then(function(data) {
-            const sankeyData = createSankey(data);
-            const chartContainer = d3.select("#chart-container");
-            const svg = chartContainer.append("svg")
-                .attr("width", width)
-                .attr("height", height);
-        });
+    d3.csv(csvFilePath, function (data) {
+        const chartContainer = d3.select("#chart-container");
+        const sankeyData = chart(data);
+        chartContainer.node().appendChild(sankeyData);
+    });
 }
