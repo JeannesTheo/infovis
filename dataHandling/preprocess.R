@@ -99,16 +99,16 @@ get_genres <- function (input_file,output_file){
   print(paste0('Will go through ',length(genres_n),' genres'))
   for (i in genres_n){
     for (occ in names(occurences_genres)){
-      occurences_genres[occ] <- str_count(i,occ) + occurences_genres[[occ]]
+      occurences_genres[occ] <- str_count(i,coll(occ)) + occurences_genres[[occ]]
     }
     cpt <- cpt+1
-    if (cpt%%5000==0){
+    if (cpt%%3000==0){
       print(paste(format(Sys.time(),'%H:%M:%S'),cpt))
-      write.csv(occurences_genres,output_file,row.names = FALSE)
+      write.csv(t(occurences_genres),output_file)
     }
   }
 
-  write.csv(occurences_genres,output_file,row.names = FALSE)
+  write.csv(t(occurences_genres),output_file)
   print('Done')
   setwd(base_dir)
 }
@@ -116,3 +116,7 @@ get_genres <- function (input_file,output_file){
 # merging_dates('songs_filtered.csv','songs_filtered_dates.csv')
 # clearing_text('songs_filtered_dates.csv',save_file= 'songs_cleared.csv','title')
 get_genres('songs_filtered_dates.csv',paste0('occurences_',format(Sys.time(),"%s"),'.csv'))
+# setwd('data')
+# data <- t(read.csv('occurences_1698043413.csv', header = TRUE, sep = ',', fill = TRUE, dec = '.'))
+# write.csv(data,'occurences_genres.csv')
+# setwd(base_dir)

@@ -1,6 +1,54 @@
 onload = function () {
     console.log("hey");
-    const chart = () => {
+
+    const graph = (data) => {
+        console.log(data)
+        const keys = data.columns.slice(0, -1);
+        let index = -1;
+        const nodes = [];
+        const nodeByKey = new Map();
+        const indexByKey = new Map();
+        const links = [];
+
+        for (const k of keys) {
+            for (const d of data) {
+                const key = [k, d[k]];
+                if (!nodeByKey.has(JSON.stringify(key))) {
+                    const node = {name: d[k]};
+                    nodes.push(node);
+                    nodeByKey.set(JSON.stringify(key), node);
+                    indexByKey.set(JSON.stringify(key), ++index);
+                }
+            }
+        }
+
+        for (let i = 1; i < keys.length; ++i) {
+            const a = keys[i - 1];
+            const b = keys[i];
+            const prefix = keys.slice(0, i + 1);
+            const linkByKey = new Map();
+            for (const d of data) {
+                const names = prefix.map(k => d[k]);
+                const value = d.value || 1;
+                if (linkByKey.has(JSON.stringify(names))) {
+                    linkByKey.get(JSON.stringify(names)).value += value;
+                } else {
+                    const link = {
+                        source: indexByKey.get(JSON.stringify([a, d[a]])),
+                        target: indexByKey.get(JSON.stringify([b, d[b]])),
+                        names: names,
+                        value: value,
+                    };
+                    links.push(link);
+                    linkByKey.set(JSON.stringify(names), link);
+                }
+            }
+        }
+
+        return {nodes, links};
+    };
+
+    const chart = (graph) => {
         const width = 928;
         const height = 720;
 
@@ -18,6 +66,7 @@ onload = function () {
             .attr("width", width)
             .attr("height", height)
             .attr("style", "max-width: 100%; height: auto;");
+
 
         const {nodes, links} = sankey({
             nodes: graph.nodes.map(d => Object.create(d)),
@@ -64,57 +113,13 @@ onload = function () {
         return svg.node();
     };
 
-    const graph = (data) => {
-        const keys = data.columns.slice(0, -1);
-        let index = -1;
-        const nodes = [];
-        const nodeByKey = new Map();
-        const indexByKey = new Map();
-        const links = [];
-
-        for (const k of keys) {
-            for (const d of data) {
-                const key = [k, d[k]];
-                if (!nodeByKey.has(JSON.stringify(key))) {
-                    const node = {name: d[k]};
-                    nodes.push(node);
-                    nodeByKey.set(JSON.stringify(key), node);
-                    indexByKey.set(JSON.stringify(key), ++index);
-                }
-            }
-        }
-
-        for (let i = 1; i < keys.length; ++i) {
-            const a = keys[i - 1];
-            const b = keys[i];
-            const prefix = keys.slice(0, i + 1);
-            const linkByKey = new Map();
-            for (const d of data) {
-                const names = prefix.map(k => d[k]);
-                const value = d.value || 1;
-                if (linkByKey.has(JSON.stringify(names))) {
-                    linkByKey.get(JSON.stringify(names)).value += value;
-                } else {
-                    const link = {
-                        source: indexByKey.get(JSON.stringify([a, d[a]])),
-                        target: indexByKey.get(JSON.stringify([b, d[b]])),
-                        names: names,
-                        value: value,
-                    };
-                    links.push(link);
-                    linkByKey.set(JSON.stringify(names), link);
-                }
-            }
-        }
-
-        return {nodes, links};
-    };
-
 // Example usage:
     const csvFilePath = "parallel_set_filtered.csv";
-    d3.csv(csvFilePath, function (data) {
+    d3.csv(csvFilePath).then(function (data) {
         const chartContainer = d3.select("#chart-container");
-        const sankeyData = chart(data);
+        console.log(':p',data);
+        const graphData = graph(data);
+        const sankeyData = chart(graphData);
         chartContainer.node().appendChild(sankeyData);
     });
 }
