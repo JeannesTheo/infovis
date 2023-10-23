@@ -46,7 +46,7 @@ join_data <- function(songs, artists, albums){
   joined_data <- inner_join(songs, artists, by = "artist_name")
   joined_data_2 <- inner_join(joined_data, albums, by="id_album")
   final <- subset(joined_data_2, select = -c(id_album, artist_name))
-  #write.csv(final, "parallel_set.csv", row.names = FALSE)
+  write.csv(final, "final.csv", row.names = FALSE)
   setwd(base_dir)
   return (final)
 }
@@ -59,23 +59,26 @@ count_data <- function (final){
     group_by_all() %>%
     summarise(count = n())
   # Step 3: Write the results to a CSV file
-  write.csv(combinations_count, "parallel_set.csv", row.names = FALSE)
+  #write.csv(combinations_count, "parallel_set.csv", row.names = FALSE)
+  write.csv(final, "parallel_set2", row.names=FALSE)
   setwd(base_dir)
 }
 
 count_without_country <- function (){
   setwd('data')
-  data <- read.csv("parallel_set.csv")
-  splited <- subset(data, select = -c(location.country))
-  write.csv(splited, "parallel_set_filtered.csv", row.names = FALSE)
+  final <- read.csv("final.csv")
+  splited <- subset(final, select = -c(location.country))
+  combinations_count <- splited %>%
+    group_by_all() %>%
+    summarise(count = n())
+  # Step 3: Write the results to a CSV file
+  write.csv(combinations_count, "parallel_set_filtered.csv", row.names = FALSE)
   setwd(base_dir)
 }
 
-songs <- split_songs()
-artists <- split_artists()
-albums <- split_album()
-final <- join_data(songs, artists, albums)
+#songs <- split_songs()
+#artists <- split_artists()
+#albums <- split_album()
+#final <- join_data(songs, artists, albums)
 count_data(final)
-count_without_country()
-
-
+#count_without_country()
