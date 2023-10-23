@@ -1,5 +1,5 @@
 library(dplyr)
-base_dir <- "C:/Users/Ambre_Correia/DataspellProjects/infovis"
+base_dir <- "C:/Users/Ambre_Correia/DataspellProjects/infovis/dataHandling"
 setwd(base_dir)
 
 split_songs <- function(){
@@ -80,5 +80,10 @@ count_without_country <- function (){
 #artists <- split_artists()
 #albums <- split_album()
 #final <- join_data(songs, artists, albums)
-count_data(final)
+#count_data(final)
 #count_without_country()
+
+setwd('data')
+data <- read.csv("parallel_set2.csv")
+f <- subset(data, select = -c(location.country))
+write.csv(f, "parallel_set3.csv", row.names = FALSE)

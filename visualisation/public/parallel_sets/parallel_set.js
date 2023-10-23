@@ -59,7 +59,7 @@ onload = function () {
             .nodePadding(20)
             .extent([[0, 5], [width, height - 5]]);
 
-        const color = d3.scaleOrdinal(["Explicit"], ["#da4f81"]).unknown("#ccc");
+        const color = d3.scaleOrdinal(["True"], ["#da4f81"]).unknown("#ccc");
 
         const svg = d3.create("svg")
             .attr("viewBox", [0, 0, width, height])
