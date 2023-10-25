@@ -79,23 +79,23 @@ count_without_country <- function (){
 delete_and_fill_lines <- function(final){
   setwd('data')
   #supprimer toutes les lignes qui n'ont pas de pays
-  datas <- final[complete.cases(final[, "location.country"]), ]
+  datas <- final[!(is_empty_string(final['location.country'])), ]
   # Spécifiez les colonnes que vous voulez vérifier pour les valeurs manquantes
   colonnes_a_verifier <- c("type", "gender", "explicitAlbum")
   # Supprimez les lignes contenant des valeurs manquantes dans TOUTES les colonnes spécifiées
-  data <- subset(datas, !apply(datas[, colonnes_a_verifier], 1, function(x) all(is.na(x))))
+  data <- subset(datas, !apply(datas[, colonnes_a_verifier], 1, function(x) all(is_empty_string(x))))
 
-  data$type <- ifelse(is.na(data$type),
-                      ifelse(data$gendre == "male", "person",
+  data$type <- ifelse(is_empty_string(data$type),
+                      ifelse(data$gender == "male", "person",
                              ifelse(data$genre == "female", "person","group")),
                       data$type)
 
-  data$explicitAlbum <- ifelse(is.na(data$explicitAlbum),
+  data$explicitAlbum <- ifelse(is_empty_string(data$explicitAlbum),
                         ifelse(data$explicitLyrics == "True", "True",
                                ifelse(data$explicitLyrics == "False", "False","False")),
                       data$explicitAlbum)
 
-  data$gender[is.na(data$gender)] <- "other"
+  data$gender[is_empty_string(data$gender)] <- "other"
 
   # Sauvegardez le résultat dans un nouveau fichier CSV si nécessaire
   write.csv(data, "filled_parallel_set.csv", row.names = FALSE)
