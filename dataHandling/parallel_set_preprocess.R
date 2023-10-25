@@ -76,6 +76,37 @@ count_without_country <- function (){
   setwd(base_dir)
 }
 
+delete_and_fill_lines <- function(final){
+  setwd('data')
+  #supprimer toutes les lignes qui n'ont pas de pays
+  datas <- final[complete.cases(final[, "location.country"]), ]
+  # Spécifiez les colonnes que vous voulez vérifier pour les valeurs manquantes
+  colonnes_a_verifier <- c("type", "gender", "explicitAlbum")
+  # Supprimez les lignes contenant des valeurs manquantes dans TOUTES les colonnes spécifiées
+  data <- subset(datas, !apply(datas[, colonnes_a_verifier], 1, function(x) all(is.na(x))))
+
+  data$type <- ifelse(is.na(data$type),
+                      ifelse(data$gendre == "male", "person",
+                             ifelse(data$genre == "female", "person","group")),
+                      data$type)
+
+  data$explicitAlbum <- ifelse(is.na(data$explicitAlbum),
+                        ifelse(data$explicitLyrics == "True", "True",
+                               ifelse(data$explicitLyrics == "False", "False","False")),
+                      data$explicitAlbum)
+
+  data$gender[is.na(data$gender)] <- "other"
+
+  # Sauvegardez le résultat dans un nouveau fichier CSV si nécessaire
+  write.csv(data, "filled_parallel_set.csv", row.names = FALSE)
+  setwd(base_dir)
+}
+
+setwd('data')
+final <- read.csv('final.csv')
+setwd(base_dir)
+delete_and_fill_lines(final)
+
 #songs <- split_songs()
 #artists <- split_artists()
 #albums <- split_album()
@@ -83,7 +114,7 @@ count_without_country <- function (){
 #count_data(final)
 #count_without_country()
 
-setwd('data')
-data <- read.csv("parallel_set2.csv")
-f <- subset(data, select = -c(location.country))
-write.csv(f, "parallel_set3.csv", row.names = FALSE)
+#setwd('data')
+#data <- read.csv("parallel_set2.csv")
+#f <- subset(data, select = -c(location.country))
+#write.csv(f, "parallel_set3.csv", row.names = FALSE)
