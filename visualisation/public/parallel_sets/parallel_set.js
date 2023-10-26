@@ -1,6 +1,4 @@
 onload = function () {
-    console.log("hey");
-
     const graph = (data) => {
         console.log(data)
         const keys = data.columns.slice(0, -1);
@@ -48,9 +46,9 @@ onload = function () {
         return {nodes, links};
     };
 
-    const chart = (graph) => {
-        const width = 928;
-        const height = 720;
+    const chart = (graph,/*list_genres*/) => {
+        const width = 928; // A adapter dynamiquement width = document.getElementById("chart-container").offsetWidth;
+        const height = 720; // A adapter dynamiquement height = document.getElementById("chart-container").offsetHeight;
 
         const sankey = d3.sankey()
             .nodeSort(null)
@@ -76,6 +74,7 @@ onload = function () {
         svg.append("g")
             .selectAll("rect")
             .data(nodes)
+//          .filter(d => list_genres.includes(d.genre))
             .join("rect")
             .attr("x", d => d.x0)
             .attr("y", d => d.y0)
@@ -87,7 +86,7 @@ onload = function () {
         svg.append("g")
             .attr("fill", "none")
             .selectAll("g")
-            .data(links)
+            .data(links) // .filter(d => list_genres.includes(d.names[0])) Might be a issue
             .join("path")
             .attr("d", d3.sankeyLinkHorizontal())
             .attr("stroke", d => color(d.names[0]))
@@ -100,6 +99,7 @@ onload = function () {
             .style("font", "10px sans-serif")
             .selectAll("text")
             .data(nodes)
+        //            .filter(d => list_genres.includes(d.genre))
             .join("text")
             .attr("x", d => d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 6)
             .attr("y", d => (d.y1 + d.y0) / 2)
@@ -113,13 +113,75 @@ onload = function () {
         return svg.node();
     };
 
+    /**
+     * Get all the genres from the data
+     * @param data
+     * @returns Set of Genres
+     */
+    function get_genres(data) {
+        let genres = new Set();
+        data.forEach(i => {
+            genres.add(i["genre"]);
+        })
+        return genres;
+    }
+
+    function createChexboxes(data){
+        // Get list of genres from data
+        let genres = get_genres(data);
+        // Get the body element
+        const checkboxes = document.getElementById("checkboxes");
+        genres.forEach(i => {
+            checkboxes.appendChild(createCheckbox(i));
+            list_genres.push(i);
+        });
+    }
+
+    function createCheckbox(txt){
+        // Create the checkbox
+        const checkbox = document.createElement('input');
+        checkbox.type = "checkbox";
+        checkbox.name = txt;
+        checkbox.value = txt;
+        checkbox.id = txt;
+        checkbox.checked = true;
+        // Create the label
+        const label = document.createElement('label');
+        label.htmlFor = txt;
+        label.appendChild(document.createTextNode(txt));
+        // Add them to the container div
+        const container = document.createElement('div');
+        container.appendChild(checkbox);
+        container.appendChild(label);
+        document.addListener(checkbox, 'click', function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            if (e.target.checked) {
+                list_genres.add(e.target.value);
+            } else {
+                list_genres.delete(e.target.value);
+            }
+            updateChart(graph,list_genres);
+        });
+        return container;
+    }
+
+function updateChart(graph,list_genres) {
+        const chartContainer = d3.select("#chart-container");
+        const sankeyData = chart(graph, list_genres);
+        // chartContainer.node().removeChild() supprimer tout les enfants
+        chartContainer.node().appendChild(sankeyData); // ajouter un enfant
+}
+
 // Example usage:
     const csvFilePath = "parallel_set_filtered.csv";
+    let list_genres = new Set(); // Set of genres to display, might need to be global
     d3.csv(csvFilePath).then(function (data) {
+        createChexboxes(data);
         const chartContainer = d3.select("#chart-container");
-        console.log(':p',data);
         const graphData = graph(data);
-        const sankeyData = chart(graphData);
-        chartContainer.node().appendChild(sankeyData);
+        // updateChart(graphData); // To add
+        const sankeyData = chart(graphData);  //To remove
+        chartContainer.node().appendChild(sankeyData); //To remove
     });
 }
