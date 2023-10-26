@@ -150,6 +150,3 @@ process_genres_in_songs<- function(songs_file,genres_file,save_file){
 # clearing_text('songs_filtered_dates.csv',save_file= 'songs_cleared.csv','title')
 # get_genres('songs_filtered_dates.csv',paste0('occurences_',format(Sys.time(),"%s"),'.csv'))
 process_genres_in_songs('songs_filtered_dates.csv','occurences_genres_grouped_clean.csv','songs_cleaned_date_genre.csv')
-songs_file <- 'songs_filtered_dates.csv'
-genres_file <- 'occurences_genres_grouped_clean.csv'
-save_file <- 'songs_filtered_dates_genres.csv'

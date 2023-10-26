@@ -13,7 +13,7 @@ onload = function (){
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
 // Parse the Data
-    d3.csv("occurences_genres.csv").then ( function(data) {
+    d3.csv("occurences_genres_grouped_clean.csv").then ( function(data) {
 
     let filteredData = data.filter(d => d.Value > 1000);
 

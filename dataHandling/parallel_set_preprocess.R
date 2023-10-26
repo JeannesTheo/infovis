@@ -88,7 +88,7 @@ delete_and_fill_lines <- function(input_file, save_file) {
   # Spécifiez les colonnes que vous voulez vérifier pour les valeurs manquantes
   colonnes_a_verifier <- c("type", "gender", "explicitAlbum")
   # # Supprimez les lignes contenant des valeurs manquantes dans TOUTES les colonnes spécifiées
-  list_all_empty <- apply(data, 1, function(x) all(is_empty_string(x)))
+  list_all_empty <- apply(data[, colonnes_a_verifier], 1, function(x) all(is_empty_string(x)))
   data <- data[!list_all_empty,]
   data$type <- mapply(function(x, y) {
     ifelse(is_empty_string(x),
