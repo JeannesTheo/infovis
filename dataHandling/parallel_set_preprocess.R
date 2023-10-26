@@ -1,8 +1,11 @@
 library(dplyr)
-base_dir <- "C:/Users/Ambre_Correia/DataspellProjects/infovis/dataHandling"
+library(utils)
+library(rlang)
+library(stringr)
+base_dir <- "/home/theojeannes/Dev/Scolaire/InfoVis/git/dataHandling"
 setwd(base_dir)
 
-split_songs <- function(){
+split_songs <- function() {
   setwd('data')
   #Step 1: Read the original CSV file into a data frame
   data <- read.csv("songs_filtered_dates.csv")
@@ -11,10 +14,10 @@ split_songs <- function(){
   # Step 3: Write the filtered data to a new CSV file
   #write.csv(songs, "parallel_set_songs.csv", row.names = FALSE)
   setwd(base_dir)
-  return (songs)
+  return(songs)
 }
 
-split_artists <- function(){
+split_artists <- function() {
   setwd('data')
   #Step 1: Read the original CSV file into a data frame
   data <- read.csv("artists.csv")
@@ -24,10 +27,10 @@ split_artists <- function(){
   # Step 3: Write the filtered data to a new CSV file
   #write.csv(artists, "parallel_set_artists.csv", row.names = FALSE)
   setwd(base_dir)
-  return (artists)
+  return(artists)
 }
 
-split_album <- function(){
+split_album <- function() {
   setwd('data')
   #Step 1: Read the original CSV file into a data frame
   data <- read.csv("albums.csv")
@@ -38,20 +41,20 @@ split_album <- function(){
   # Step 3: Write the filtered data to a new CSV file
   #write.csv(albums, "parallel_set_albums.csv", row.names = FALSE)
   setwd(base_dir)
-  return (albums)
+  return(albums)
 }
 
-join_data <- function(songs, artists, albums){
+join_data <- function(songs, artists, albums) {
   setwd('data')
   joined_data <- inner_join(songs, artists, by = "artist_name")
-  joined_data_2 <- inner_join(joined_data, albums, by="id_album")
+  joined_data_2 <- inner_join(joined_data, albums, by = "id_album")
   final <- subset(joined_data_2, select = -c(id_album, artist_name))
   write.csv(final, "final.csv", row.names = FALSE)
   setwd(base_dir)
-  return (final)
+  return(final)
 }
 
-count_data <- function (final){
+count_data <- function(final) {
   setwd('data')
   #data <- read.csv("parallel_set_songs.csv")
   # Step 2: Use dplyr to group and count unique combinations
@@ -60,11 +63,11 @@ count_data <- function (final){
     summarise(count = n())
   # Step 3: Write the results to a CSV file
   #write.csv(combinations_count, "parallel_set.csv", row.names = FALSE)
-  write.csv(final, "parallel_set2", row.names=FALSE)
+  write.csv(final, "parallel_set2", row.names = FALSE)
   setwd(base_dir)
 }
 
-count_without_country <- function (){
+count_without_country <- function() {
   setwd('data')
   final <- read.csv("final.csv")
   splited <- subset(final, select = -c(location.country))
@@ -76,37 +79,41 @@ count_without_country <- function (){
   setwd(base_dir)
 }
 
-delete_and_fill_lines <- function(final){
+delete_and_fill_lines <- function(input_file, save_file) {
   setwd('data')
+  final <- read.csv(input_file, header = TRUE, sep = ',', fill = TRUE, dec = '.')
   #supprimer toutes les lignes qui n'ont pas de pays
-  datas <- final[!(is_empty_string(final['location.country'])), ]
+  list_countries_empty <- sapply(final$location.country, is_empty_string)
+  data <- final[!list_countries_empty,]
   # Spécifiez les colonnes que vous voulez vérifier pour les valeurs manquantes
   colonnes_a_verifier <- c("type", "gender", "explicitAlbum")
-  # Supprimez les lignes contenant des valeurs manquantes dans TOUTES les colonnes spécifiées
-  data <- subset(datas, !apply(datas[, colonnes_a_verifier], 1, function(x) all(is_empty_string(x))))
+  # # Supprimez les lignes contenant des valeurs manquantes dans TOUTES les colonnes spécifiées
+  list_all_empty <- apply(data, 1, function(x) all(is_empty_string(x)))
+  data <- data[!list_all_empty,]
+  data$type <- mapply(function(x, y) {
+    ifelse(is_empty_string(x),
+           ifelse(y == "Male" || y == "Female", "Person", "Group"),
+           x)
+  }, data$type, data$gender)
 
-  data$type <- ifelse(is_empty_string(data$type),
-                      ifelse(data$gender == "male", "person",
-                             ifelse(data$genre == "female", "person","group")),
-                      data$type)
+  data$explicitAlbum <- mapply(function (x,y){ ifelse(is_empty_string(x),
+                                                      ifelse(y == "True", "True", "False"),
+                                                      x)},data$explicitAlbum,data$explicitLyrics)
 
-  data$explicitAlbum <- ifelse(is_empty_string(data$explicitAlbum),
-                        ifelse(data$explicitLyrics == "True", "True",
-                               ifelse(data$explicitLyrics == "False", "False","False")),
-                      data$explicitAlbum)
-
-  data$gender[is_empty_string(data$gender)] <- "other"
+  data$gender <- mapply(function(x) {
+    ifelse(is_empty_string(x), "Other", x)
+  }, data$gender)
 
   # Sauvegardez le résultat dans un nouveau fichier CSV si nécessaire
-  write.csv(data, "filled_parallel_set.csv", row.names = FALSE)
+  write.csv(data, save_file, row.names = FALSE)
   setwd(base_dir)
 }
 
-setwd('data')
-final <- read.csv('final.csv')
-setwd(base_dir)
-delete_and_fill_lines(final)
+is_empty_string <- function(x) return(is_null(x) || is_na(x) || is_empty(x) || x == "")
 
+print('Start')
+delete_and_fill_lines(input_file='final.csv',save_file="filled_parallel_set.csv")
+print('Done')
 #songs <- split_songs()
 #artists <- split_artists()
 #albums <- split_album()
