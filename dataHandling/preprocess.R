@@ -113,10 +113,43 @@ get_genres <- function (input_file,output_file){
   setwd(base_dir)
 }
 
+set_correct_genre <- function (x,genres){
+  if (is_empty_string(x) | x =="[]"){
+      return('Undefined')
+  }else{
+    x <- unlist(split_genres(x))
+    x <- lapply(x, function (x) gsub("[^a-zA-Z]", ".", x))
+    for (i in 1:nrow(genres)){
+      genres_group <- genres[i,'Grouped_genres']
+      group <- genres[i,'Genre']
+      for (j in x){
+        if (str_detect(genres_group,j)){
+          return (group)
+        }
+      }
+    }
+    print(paste('Pas trouvé :',x))
+    return ('Other')
+  }
+}
+
+process_genres_in_songs<- function(songs_file,genres_file,save_file){
+  setwd('data')
+  print('Start cleaning genres')
+  songs <- read.csv(songs_file, header = TRUE, sep = ',', fill = TRUE, dec = '.')
+  genres <- read.csv(genres_file, header = TRUE, sep = ',', fill = TRUE, dec = '.')
+  genres <- genres[order(genres$Value,decreasing = TRUE),]
+  genres <- subset(genres, select = c('Genre','Grouped_genres'))
+  songs$genre <- mapply(set_correct_genre,songs$genre,MoreArgs = list(genres))
+  write.csv(songs,save_file,row.names = FALSE)
+  setwd(base_dir)
+  print(paste0('Done cleaning genres, saved in ',save_file))
+}
+
 # merging_dates('songs_filtered.csv','songs_filtered_dates.csv')
 # clearing_text('songs_filtered_dates.csv',save_file= 'songs_cleared.csv','title')
-get_genres('songs_filtered_dates.csv',paste0('occurences_',format(Sys.time(),"%s"),'.csv'))
-# setwd('data')
-# data <- t(read.csv('occurences_1698043413.csv', header = TRUE, sep = ',', fill = TRUE, dec = '.'))
-# write.csv(data,'occurences_genres.csv')
-# setwd(base_dir)
+# get_genres('songs_filtered_dates.csv',paste0('occurences_',format(Sys.time(),"%s"),'.csv'))
+process_genres_in_songs('songs_filtered_dates.csv','occurences_genres_grouped_clean.csv','songs_cleaned_date_genre.csv')
+songs_file <- 'songs_filtered_dates.csv'
+genres_file <- 'occurences_genres_grouped_clean.csv'
+save_file <- 'songs_filtered_dates_genres.csv'
