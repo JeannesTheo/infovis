@@ -1,3 +1,14 @@
+function updateOnClick(e, path) {
+    path.style.stroke = "purple";
+    console.log(e.target.textContent);
+}
+
+function resetOnClick() {
+    Array.from(document.getElementsByTagName('path')).forEach(function (evt) {
+        evt.style.stroke = " cyan";
+    });
+}
+
 window.onload = function () {
     function createCheckboxes(genres) {
         const genreDropdown = document.getElementById('genre-dropdown');
@@ -18,30 +29,16 @@ window.onload = function () {
         createCheckboxes(genres);
         const chartContainer = d3.select("#chart-container");
         const graphData = graph(data);
-        const sankeyData = chart(graphData, genres);
+        const sankeyData = chart(graphData);
         chartContainer.node().appendChild(sankeyData);
+        Array.from(chartContainer.node().firstChild.getElementsByTagName('path')).forEach(function (path) {
+            path.addEventListener('click', function (e) {
+                resetOnClick()
+                updateOnClick(e, path)
+            });
+        });
     });
-
-
-    // const c = document.getElementById("chart-container");
-    // c.addEventListener('click', function() {
-    //     console.log("click");
-    //     tmp = d3.select(this);
-    //     tmp.attr('fill', 'red');
-    //     console.log(tmp);
-    // });
-    addPathsListeners()
-}
-
-function addPathsListeners() {
-    Array.from(document.getElementsByTagName("svg")).forEach(function(path){
-        path.addEventListener('click', function (e) {
-                console.log("path click");
-                console.log(e);
-            }
-        )
-    })
-}
+};
 
 const graph = (data) => {
     console.log(data)
@@ -90,7 +87,7 @@ const graph = (data) => {
     return {nodes, links};
 };
 
-const chart = (graph, list_genres) => {
+const chart = (graph) => {
     const width = 1200; // A adapter dynamiquement width = document.getElementById("chart-container").offsetWidth;
     const height = 720; // A adapter dynamiquement height = document.getElementById("chart-container").offsetHeight;
 
@@ -111,10 +108,9 @@ const chart = (graph, list_genres) => {
 
 
     const {nodes, links} = sankey({
-        nodes: graph.nodes.map(d => Object.create(d)),
-        links: graph.links.map(d => Object.create(d))
+        nodes: graph.nodes.map(d => Object.create(d)), links: graph.links.map(d => Object.create(d))
     });
-
+    // Carré / Barre noire
     svg.append("g")
         .selectAll("rect")
         .data(nodes)
@@ -126,6 +122,7 @@ const chart = (graph, list_genres) => {
         .append("title")
         .text(d => `Y ${d.name}\n${d.value.toLocaleString()}`);
 
+    //hover tooltip
     svg.append("g")
         .attr("fill", "none")
         .selectAll("g")
@@ -136,7 +133,7 @@ const chart = (graph, list_genres) => {
         .attr("stroke-width", d => d.width)
         .style("mix-blend-mode", "multiply")
         .append("title")
-        .text(d => `${d.names.join(" → ")}\n${d.value.toLocaleString()}`)
+        .text(d => `${d.names.join(" → ")}\n${d.value.toLocaleString()}`);
 
     svg.append("g")
         .style("font", "1em sans-serif")
@@ -150,12 +147,15 @@ const chart = (graph, list_genres) => {
         .text(d => d.name)
         .append("tspan")
         .attr("fill-opacity", 0.7)
-        .text(d => ` ${d.value.toLocaleString()}`);
-
-    // append un autre g pour le on click details?
+        .text(d => ` ${d.value.toLocaleString()}`)
+        .on("click", d => {
+            console.log(d);
+            resetOnClick()
+            // updateOnClick()
+        });
 
     return svg.node();
-};
+}
 
 function updateChart() {
     const csvFilePath = "filled_parallel_set.csv";
@@ -164,19 +164,23 @@ function updateChart() {
         const genreDropdown = document.getElementById('genre-dropdown');
         const selectedGenres = Array.from(genreDropdown.selectedOptions).map(option => option.value);
         console.log(selectedGenres);
-        const filtered = data.filter(function(d)
-        {
+        const filtered = data.filter(function (d) {
             if (selectedGenres.includes(d["genre"])) {
                 return d;
             }
         });
         filtered.columns = data.columns;
-        console.log(typeof data,typeof filtered);
         const chartContainer = d3.select("#chart-container");
         const upGraphData = graph(filtered);
-        const upSankeyData = chart(upGraphData, selectedGenres);
+        const upSankeyData = chart(upGraphData);
         //remove child
         chartContainer.node().removeChild(chartContainer.node().lastChild);
         chartContainer.node().appendChild(upSankeyData);
+        //TODO fix event listener
+        Array.from(chartContainer.node().firstChild.getElementsByTagName('path')).forEach(function (path) {
+            path.addEventListener('click', function () {
+                console.log(path);
+            });
+        });
     });
 }
