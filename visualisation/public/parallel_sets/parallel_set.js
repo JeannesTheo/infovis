@@ -1,11 +1,24 @@
 function updateOnClick(e, path) {
-    path.style.stroke = "purple";
-    console.log(e.target.textContent);
+    e.target.style.stroke = "#acd75a";
+    path.setAttribute("stroke", "#acd75a");
+    let c = e.target.textContent.split(" → ");
 }
 
 function resetOnClick() {
     Array.from(document.getElementsByTagName('path')).forEach(function (evt) {
         evt.style.stroke = " cyan";
+    });
+}
+
+function backOnClick() {
+    Array.from(document.getElementsByTagName('path')).forEach(function (evt) {
+        if(evt.textContent.includes("True")){
+            evt.setAttribute("stroke", "#f34343");
+            evt.style.stroke = "#f34343";
+        } else {
+            evt.setAttribute("stroke", "#93e0d8");
+            evt.style.stroke = "#93e0d8";
+        }
     });
 }
 
@@ -24,20 +37,8 @@ window.onload = function () {
     }
 
     const genres = ["Alternative", "Baroque", "Blues", "Country", "Dance", "Disco", "Electro", "Folk", "Funk", "Gospel", "Hip-hop", "House", "Jazz", "Metal", "Other", "Pop", "Punk", "R&B", "Reggae", "Rock", "Souls", "Undefined"]
-    const csvFilePath = "filled_parallel_set.csv";
-    d3.csv(csvFilePath).then(function (data) {
-        createCheckboxes(genres);
-        const chartContainer = d3.select("#chart-container");
-        const graphData = graph(data);
-        const sankeyData = chart(graphData);
-        chartContainer.node().appendChild(sankeyData);
-        Array.from(chartContainer.node().firstChild.getElementsByTagName('path')).forEach(function (path) {
-            path.addEventListener('click', function (e) {
-                resetOnClick()
-                updateOnClick(e, path)
-            });
-        });
-    });
+    createCheckboxes(genres);
+    updateChart(false);
 };
 
 const graph = (data) => {
@@ -148,6 +149,7 @@ const chart = (graph) => {
         .append("tspan")
         .attr("fill-opacity", 0.7)
         .text(d => ` ${d.value.toLocaleString()}`)
+        //click sur text
         .on("click", d => {
             console.log(d);
             resetOnClick()
@@ -157,29 +159,46 @@ const chart = (graph) => {
     return svg.node();
 }
 
-function updateChart() {
+function updateChart(remove = true){
     const csvFilePath = "filled_parallel_set.csv";
     d3.csv(csvFilePath).then(function (data) {
         console.log("updateChart");
         const genreDropdown = document.getElementById('genre-dropdown');
         const selectedGenres = Array.from(genreDropdown.selectedOptions).map(option => option.value);
         console.log(selectedGenres);
-        const filtered = data.filter(function (d) {
-            if (selectedGenres.includes(d["genre"])) {
-                return d;
-            }
-        });
-        filtered.columns = data.columns;
         const chartContainer = d3.select("#chart-container");
-        const upGraphData = graph(filtered);
+        let upGraphData;
+        if(selectedGenres.length){
+            let filtered = data.filter(function (d) {
+                if (selectedGenres.includes(d["genre"])) {
+                    return d;
+                }
+            });
+            filtered.columns = data.columns;
+            console.log("filtered", filtered);
+            upGraphData = graph(filtered);
+        } else {
+            upGraphData = graph(data);
+            console.log("data", data);
+        }
         const upSankeyData = chart(upGraphData);
         //remove child
-        chartContainer.node().removeChild(chartContainer.node().lastChild);
+        if(remove){
+            chartContainer.node().removeChild(chartContainer.node().lastChild);
+        }
         chartContainer.node().appendChild(upSankeyData);
-        //TODO fix event listener
         Array.from(chartContainer.node().firstChild.getElementsByTagName('path')).forEach(function (path) {
-            path.addEventListener('click', function () {
-                console.log(path);
+            path.addEventListener('click', function (e) {
+                console.log("path", path);
+                if (path.getAttribute("stroke") !== "#acd75a"){
+                    resetOnClick()
+                    //passer le total en param
+                    updateOnClick(e, path)
+                } else {
+                    backOnClick()
+                }
+                //cours aline pour display block
+                // remettre les couleurs de base des paths
             });
         });
     });
