@@ -1,7 +1,15 @@
-function updateOnClick(e, path) {
+function updateOnClick(e, path, total) {
     e.target.style.stroke = "#acd75a";
     path.setAttribute("stroke", "#acd75a");
     let c = e.target.textContent.split(" → ");
+    let d = document.getElementById("details");
+    const pattern = /Group (\d+)/; // Regular expression pattern
+    const match = e.target.textContent.match(pattern);
+    console.log("number", match);
+    console.log("total", total);
+    let stat = parseInt(match[1], 10)/total * 100;
+    d.textContent = e.target.textContent + " represents " + stat.toFixed(2) + "% of the total.";
+    d.style.display = "flex";
 }
 
 function resetOnClick() {
@@ -19,6 +27,9 @@ function backOnClick() {
             evt.setAttribute("stroke", "#93e0d8");
             evt.style.stroke = "#93e0d8";
         }
+        let d = document.getElementById("details");
+        d.textContent = "";
+        d.style.display = "none";
     });
 }
 
@@ -193,7 +204,7 @@ function updateChart(remove = true){
                 if (path.getAttribute("stroke") !== "#acd75a"){
                     resetOnClick()
                     //passer le total en param
-                    updateOnClick(e, path)
+                    updateOnClick(e, path, data.rows)
                 } else {
                     backOnClick()
                 }
