@@ -11,11 +11,29 @@
     <title>Parallels Sets</title>
 </head>
 <body>
-<h2>Genres:</h2>
-<select id="genre-dropdown" multiple="multiple"></select>
-<div id="details">
-    <p id="detail"></p>
+<div id="loading">
+    <div id="loading-text">We are processing the data</div>
 </div>
-<div id="chart-container"></div>
+<div id="general-container">
+    <div id="title">
+        <div>
+            <span>Choisissez les genres :</span>
+            <span><button id="filter-button">Filter</button></span>
+        </div>
+    </div>
+    <!--<select id="genre-dropdown" multiple="multiple"></select>-->
+    <div id="genre-selector" class="container"></div>
+    <div id="details">
+        <p id="detail"></p>
+    </div>
+    <div id="header-container">
+        <div class="header">Explicit Lyrics</div>
+        <div class="header">Music genre</div>
+        <div class="header">Artist Type</div>
+        <div class="header">Artist Gender</div>
+    </div>
+    <div id="chart-container"></div>
+</div>
+
 </body>
 </html>
