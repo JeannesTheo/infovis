@@ -3,12 +3,12 @@ function updateOnClick(e, path, total) {
     path.setAttribute("stroke", "#acd75a");
     let c = e.target.textContent.split(" → ");
     let d = document.getElementById("details");
-    const pattern = /Group (\d+)/; // Regular expression pattern
-    const match = e.target.textContent.match(pattern);
-    console.log("number", match);
+    const number = e.target.textContent.replace(/\D/g, "");
+    const text = e.target.textContent.replace(/\d+/g, "");
+    console.log("number", number);
     console.log("total", total);
-    let stat = parseInt(match[1], 10)/total * 100;
-    d.textContent = e.target.textContent + " represents " + stat.toFixed(2) + "% of the total.";
+    let stat = parseInt(number, 10) / total * 100;
+    d.textContent = text + " represents " + stat.toFixed(2) + "% of the total.";
     d.style.display = "flex";
 }
 
@@ -20,7 +20,7 @@ function resetOnClick() {
 
 function backOnClick() {
     Array.from(document.getElementsByTagName('path')).forEach(function (evt) {
-        if(evt.textContent.includes("True")){
+        if (evt.textContent.includes("True")) {
             evt.setAttribute("stroke", "#f34343");
             evt.style.stroke = "#f34343";
         } else {
@@ -170,7 +170,8 @@ const chart = (graph) => {
     return svg.node();
 }
 
-function updateChart(remove = true){
+
+function updateChart(remove = true) {
     const csvFilePath = "filled_parallel_set.csv";
     d3.csv(csvFilePath).then(function (data) {
         console.log("updateChart");
@@ -179,37 +180,39 @@ function updateChart(remove = true){
         console.log(selectedGenres);
         const chartContainer = d3.select("#chart-container");
         let upGraphData;
-        if(selectedGenres.length){
+        let numRows;
+        if (selectedGenres.length) {
             let filtered = data.filter(function (d) {
                 if (selectedGenres.includes(d["genre"])) {
                     return d;
                 }
             });
             filtered.columns = data.columns;
-            console.log("filtered", filtered);
             upGraphData = graph(filtered);
+            numRows = filtered.length;
         } else {
             upGraphData = graph(data);
-            console.log("data", data);
+            numRows = data.length;
         }
+        console.log("total", numRows);
+
         const upSankeyData = chart(upGraphData);
         //remove child
-        if(remove){
+        if (remove) {
             chartContainer.node().removeChild(chartContainer.node().lastChild);
         }
         chartContainer.node().appendChild(upSankeyData);
+
         Array.from(chartContainer.node().firstChild.getElementsByTagName('path')).forEach(function (path) {
             path.addEventListener('click', function (e) {
                 console.log("path", path);
-                if (path.getAttribute("stroke") !== "#acd75a"){
+                if (path.getAttribute("stroke") !== "#acd75a") {
                     resetOnClick()
                     //passer le total en param
-                    updateOnClick(e, path, data.rows)
+                    updateOnClick(e, path, numRows)
                 } else {
                     backOnClick()
                 }
-                //cours aline pour display block
-                // remettre les couleurs de base des paths
             });
         });
     });
