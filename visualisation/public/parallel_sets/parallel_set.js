@@ -1,20 +1,55 @@
 function updateOnClick(e, path, total) {
     e.target.style.stroke = "#acd75a";
     path.setAttribute("stroke", "#acd75a");
-    let c = e.target.textContent.split(" → ");
     let d = document.getElementById("details");
     const number = e.target.textContent.replace(/\D/g, "");
     const text = e.target.textContent.replace(/\d+/g, "");
-    console.log("number", number);
-    console.log("total", total);
+    let isDragging = false;
+    let offsetX, offsetY;
     let stat = parseInt(number, 10) / total * 100;
     d.textContent = text + " represents " + stat.toFixed(2) + "% of the total.";
     d.style.display = "flex";
+    d.style.position = "absolute";
+    d.style.left = e.clientX + 10 + 'px';
+    d.style.top = e.clientY + 10 + 'px';
+    d.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        offsetX = e.clientX - d.offsetLeft;
+        offsetY = e.clientY - d.offsetTop;
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+            d.style.left = e.clientX - offsetX + 'px';
+            d.style.top = e.clientY - offsetY + 'px';
+        }
+    });
+}
+
+function lightenDarkenColor(col,amt) {
+    if (col[0]==="#") {
+        col = col.slice(1);
+    }
+
+    let num = parseInt(col,16);
+    let f=function(n) { return n>255?255:(Math.max(0,n)) }
+    let h=function(n) { return n.length<2?"0"+n:n }
+
+    let r = h(f((num >> 16) + amt).toString(16));
+    let b = h(f(((num >> 8) & 0x00FF) + amt).toString(16));
+    let g = h(f((num & 0x0000FF) + amt).toString(16));
+
+    return "#" + r + b + g;
 }
 
 function resetOnClick() {
+    backOnClick()
     Array.from(document.getElementsByTagName('path')).forEach(function (evt) {
-        evt.style.stroke = " cyan";
+        evt.style.stroke =  lightenDarkenColor(evt.getAttribute("stroke"), 90);
     });
 }
 
@@ -71,14 +106,12 @@ window.onload = function () {
 };
 
 const graph = (data) => {
-    console.log(data)
-    const keys = data.columns.slice(0, -1);
+    const keys = data.columns;
     let index = -1;
     const nodes = [];
     const nodeByKey = new Map();
     const indexByKey = new Map();
     const links = [];
-
     for (const k of keys) {
         for (const d of data) {
             const key = [k, d[k]];
@@ -113,28 +146,47 @@ const graph = (data) => {
             }
         }
     }
-
     return {nodes, links};
 };
 
-const chart = (graph) => {
-    const width = 1200; // A adapter dynamiquement width = document.getElementById("chart-container").offsetWidth;
-    const height = 720; // A adapter dynamiquement height = document.getElementById("chart-container").offsetHeight;
+function getWidth() {
+    return Math.max(
+        document.body.scrollWidth,
+        document.documentElement.scrollWidth,
+        document.body.offsetWidth,
+        document.documentElement.offsetWidth,
+        document.documentElement.clientWidth
+    );
+}
 
+function getHeight() {
+    return Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight,
+        document.body.offsetHeight,
+        document.documentElement.offsetHeight,
+        document.documentElement.clientHeight
+    );
+}
+
+const chart = (graph) => {
+    const width = getWidth();
+    const height = getHeight();
+    console.log(width,'*',height);
     const sankey = d3.sankey()
         .nodeSort(null)
         .linkSort(null)
         .nodeWidth(4)
         .nodePadding(20)
-        .extent([[0, 5], [width, height - 5]]);
+        .extent([[0, 0], [width, height-20]]);
 
     const color = d3.scaleOrdinal(["True"], ["#f34343"]).unknown("#93e0d8");
 
     const svg = d3.create("svg")
         .attr("viewBox", [0, 0, width, height])
+        // .attr("viewBox", [width*.1, 0, width*.8, height*.7])
         .attr("width", width)
-        .attr("height", height)
-        .attr("style", "max-width: 100%; height: auto;");
+        .attr("style", "max-width: 86%; height: auto; padding-left : 7%; margin-top: 2em;");
 
 
     const {nodes, links} = sankey({
@@ -177,13 +229,7 @@ const chart = (graph) => {
         .text(d => d.name)
         .append("tspan")
         .attr("fill-opacity", 0.7)
-        .text(d => ` ${d.value.toLocaleString()}`)
-        //click sur text
-        .on("click", d => {
-            console.log(d);
-            resetOnClick()
-            // updateOnClick()
-        });
+        .text(d => ` ${d.value.toLocaleString()}`);
 
     document.getElementById("loading").style.display = "none";
     document.getElementById("general-container").style.visibility = "visible";
@@ -197,10 +243,8 @@ function updateChart(remove = true) {
 
     const csvFilePath = "filled_parallel_set.csv";
     d3.csv(csvFilePath).then(function (data) {
-        console.log("updateChart");
         const genreSelector = document.getElementById('genre-selector');
         const selectedGenres = Array.from(genreSelector.querySelectorAll('input[type="checkbox"]:checked')).map(function (checkbox) { return checkbox.value; });
-        console.log(selectedGenres);
         const chartContainer = d3.select("#chart-container");
         let upGraphData;
         let numRows;
@@ -217,8 +261,6 @@ function updateChart(remove = true) {
             upGraphData = graph(data);
             numRows = data.length;
         }
-        console.log("total", numRows);
-
         const upSankeyData = chart(upGraphData);
         //remove child
         if (remove) {
@@ -228,7 +270,6 @@ function updateChart(remove = true) {
 
         Array.from(chartContainer.node().firstChild.getElementsByTagName('path')).forEach(function (path) {
             path.addEventListener('click', function (e) {
-                console.log("path", path);
                 if (path.getAttribute("stroke") !== "#acd75a") {
                     resetOnClick()
                     //passer le total en param
