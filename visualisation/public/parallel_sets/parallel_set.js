@@ -35,16 +35,34 @@ function backOnClick() {
 
 window.onload = function () {
     function createCheckboxes(genres) {
-        const genreDropdown = document.getElementById('genre-dropdown');
+        const genreSelector  = document.getElementById('genre-selector');
 
         genres.forEach(genre => {
-            const option = document.createElement('option');
-            option.value = genre;
-            option.text = genre;
-            genreDropdown.appendChild(option);
+            // Créez un élément div avec la classe "form-element"
+            const formElement = document.createElement("div");
+            formElement.classList.add("form-element");
+
+            // Créez un élément input de type checkbox
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.value = genre;
+            checkbox.id = genre.toLowerCase();
+
+            // Créez un élément label avec la classe "title" et le texte du genre
+            const label = document.createElement("label");
+            label.htmlFor = genre.toLowerCase();
+            label.classList.add("title");
+            label.textContent = genre;
+
+            // Ajoutez l'input et le label à l'élément div "form-element"
+            formElement.appendChild(checkbox);
+            formElement.appendChild(label);
+
+            // Ajoutez l'élément "form-element" au conteneur "genre-selector"
+            genreSelector.appendChild(formElement);
         });
 
-        genreDropdown.addEventListener('click', updateChart);
+        document.getElementById('filter-button').addEventListener('click', updateChart);
     }
 
     const genres = ["Alternative", "Baroque", "Blues", "Country", "Dance", "Disco", "Electro", "Folk", "Funk", "Gospel", "Hip-hop", "House", "Jazz", "Metal", "Other", "Pop", "Punk", "R&B", "Reggae", "Rock", "Souls", "Undefined"]
@@ -167,16 +185,21 @@ const chart = (graph) => {
             // updateOnClick()
         });
 
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("general-container").style.visibility = "visible";
     return svg.node();
 }
 
 
 function updateChart(remove = true) {
+    document.getElementById("loading").style.display = "flex";
+    document.getElementById("general-container").style.visibility = "hidden";
+
     const csvFilePath = "filled_parallel_set.csv";
     d3.csv(csvFilePath).then(function (data) {
         console.log("updateChart");
-        const genreDropdown = document.getElementById('genre-dropdown');
-        const selectedGenres = Array.from(genreDropdown.selectedOptions).map(option => option.value);
+        const genreSelector = document.getElementById('genre-selector');
+        const selectedGenres = Array.from(genreSelector.querySelectorAll('input[type="checkbox"]:checked')).map(function (checkbox) { return checkbox.value; });
         console.log(selectedGenres);
         const chartContainer = d3.select("#chart-container");
         let upGraphData;
