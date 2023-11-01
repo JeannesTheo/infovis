@@ -1,3 +1,4 @@
+import {lightenDarkenColor,getWidth,getHeight} from '../utils.js';
 function updateOnClick(e, path, total) {
     e.target.style.stroke = "#acd75a";
     path.setAttribute("stroke", "#acd75a");
@@ -28,22 +29,6 @@ function updateOnClick(e, path, total) {
             d.style.top = e.clientY - offsetY + 'px';
         }
     });
-}
-
-function lightenDarkenColor(col,amt) {
-    if (col[0]==="#") {
-        col = col.slice(1);
-    }
-
-    let num = parseInt(col,16);
-    let f=function(n) { return n>255?255:(Math.max(0,n)) }
-    let h=function(n) { return n.length<2?"0"+n:n }
-
-    let r = h(f((num >> 16) + amt).toString(16));
-    let b = h(f(((num >> 8) & 0x00FF) + amt).toString(16));
-    let g = h(f((num & 0x0000FF) + amt).toString(16));
-
-    return "#" + r + b + g;
 }
 
 function resetOnClick() {
@@ -149,26 +134,6 @@ const graph = (data) => {
     return {nodes, links};
 };
 
-function getWidth() {
-    return Math.max(
-        document.body.scrollWidth,
-        document.documentElement.scrollWidth,
-        document.body.offsetWidth,
-        document.documentElement.offsetWidth,
-        document.documentElement.clientWidth
-    );
-}
-
-function getHeight() {
-    return Math.max(
-        document.body.scrollHeight,
-        document.documentElement.scrollHeight,
-        document.body.offsetHeight,
-        document.documentElement.offsetHeight,
-        document.documentElement.clientHeight
-    );
-}
-
 const chart = (graph) => {
     const width = getWidth();
     const height = getHeight();
@@ -186,7 +151,7 @@ const chart = (graph) => {
         .attr("viewBox", [0, 0, width, height])
         // .attr("viewBox", [width*.1, 0, width*.8, height*.7])
         .attr("width", width)
-        .attr("style", "max-width: 86%; height: auto; padding-left : 7%; margin-top: 2em;");
+        .attr("style", "max-width: 86%; height: auto; margin-top: 2em;");
 
 
     const {nodes, links} = sankey({
