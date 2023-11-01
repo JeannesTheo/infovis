@@ -31,7 +31,6 @@ filter_columns <- function() {
 is_empty_string <- function(x) return(is_null(x) || is_na(x) || is_empty(x) || x == "")
 is_empty_date <- function(x) return(is_empty_string(x) || x == '0000-00-00')
 clean_date_string <- function(x) return(str_subset(x, "[\\[\\] ]", negate = TRUE))
-options(warn = 2)
 
 get_year <- function(x, y) {
   year <- 0
@@ -44,8 +43,7 @@ get_year <- function(x, y) {
       year <- y
     tryCatch(
     { year <- year(ymd(year)) },
-    warning = function (w){ print(paste("Problem :", x, y,w)) },
-    error = function (e){ print(paste('C \' est la merde: ', x, y,e)) }
+    warning = function (w){ print(paste("Problem :", x, y,w)) }
     )
 
   }
@@ -89,9 +87,8 @@ get_genres <- function (input_file,output_file){
   genres_unique <- unique(unlist(lapply(genres,split_genres)))
   occurences_genres <- list()
   for (i in genres_unique){
-    occurences_genres[[coll(i)]] <- 0
+    occurences_genres[[i]] <- 0
   }
-  occurences_genres <- occurences_genres[-1]
   cpt <- 0
   print(paste0('Will save in ',output_file))
   genres_n <- data$genre
@@ -104,11 +101,11 @@ get_genres <- function (input_file,output_file){
     cpt <- cpt+1
     if (cpt%%3000==0){
       print(paste(format(Sys.time(),'%H:%M:%S'),cpt))
-      write.csv(t(occurences_genres),output_file)
+      write.csv(occurences_genres,output_file)
     }
   }
 
-  write.csv(t(occurences_genres),output_file)
+  write.csv(occurences_genres,output_file)
   print('Done')
   setwd(base_dir)
 }
@@ -146,7 +143,18 @@ process_genres_in_songs<- function(songs_file,genres_file,save_file){
   print(paste0('Done cleaning genres, saved in ',save_file))
 }
 
+transpose_data <- function(input_file,save_file) {
+  get_genres('songs_cleaned_date_genre.csv', input_file)
+  setwd('data')
+  data <- read.csv(file, header = FALSE, sep = ',', fill = TRUE, dec = '.')
+  write.csv(t(data), save_file, row.names = FALSE)
+  setwd(base_dir)
+}
+
+
 # merging_dates('songs_filtered.csv','songs_filtered_dates.csv')
 # clearing_text('songs_filtered_dates.csv',save_file= 'songs_cleared.csv','title')
 # get_genres('songs_filtered_dates.csv',paste0('occurences_',format(Sys.time(),"%s"),'.csv'))
-process_genres_in_songs('songs_filtered_dates.csv','occurences_genres_grouped_clean.csv','songs_cleaned_date_genre.csv')
+# process_genres_in_songs('songs_filtered_dates.csv','occurences_genres_grouped_clean.csv','songs_cleaned_date_genre.csv')
+# transpose_data('occurences_1698356638.csv','occurences_genre_in_songs.csv')
+
