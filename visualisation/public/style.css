@@ -3,7 +3,9 @@
 body {
     font-family: Arial, sans-serif;
     text-align: center;
-    margin: 50px;
+    /*margin: 50px;*/
+    margin: 0;
+    padding: 0;
 }
 
 button {
@@ -24,4 +26,13 @@ button:hover {
 button:disabled {
     background-color: #999999;
     cursor: not-allowed;
+}
+
+header {
+    background-color: #333; /* Set the background color */
+    color: #fff; /* Set the text color */
+    /*padding: 10px; !* Add some padding for spacing *!*/
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Space items evenly */
+    align-items: center; /* Align items vertically */
 }
