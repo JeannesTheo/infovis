@@ -2,9 +2,10 @@
 <html lang="fr">
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-    <title>Condegram Spiral Plot</title>
+    <title>Spiral Plot</title>
     <link rel="stylesheet" type="text/css" href="../style.css"/>
     <link rel="stylesheet" type="text/css" href="style.css"/>
+    <link rel="stylesheet" type="text/css" href="slider.css"/>
     <script type="text/javascript" src="../lib/d3js.org_d3.v5.js"></script>
     <script type="module" src="main.js" defer></script>
 </head>
@@ -16,6 +17,51 @@
     <button onclick="window.location.href='../distrib/index.html'">Distribution des Genres</button>
     <button onclick="window.location.href='page4.html'">Bouton 4</button>
 </header>
-<div id="chart"></div>
+<main>
+    <div id="filters">
+        <div id="years">
+            <div class="range_container">
+                <div class="sliders_control">
+                    <input id="fromSlider" type="range" value="1962" min="1962" max="2017"/>
+                    <input id="toSlider" type="range" value="2017" min="1962" max="2017"/>
+                </div>
+                <div class="form_control">
+                    <div class="form_control_container">
+                        <label for='fromInput' class="form_control_container__time">First Year</label>
+                        <input class="form_control_container__time__input" type="number" id="fromInput" value="1962"/>
+                    </div>
+                    <div class="form_control_container">
+                        <label for="toInput" class="form_control_container__time">Last Year</label>
+                        <input class="form_control_container__time__input" type="number" id="toInput" value="2017"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="genres"></div>
+        <div id="checkboxes">
+            <input type="checkbox" id="explicitCheckbox" checked> <label for="explicitCheckbox">Show explicit songs</label>
+            <input type="checkbox" id="implicitCheckbox" checked> <label for="implicitCheckbox">Show implicit songs</label>
+
+        </div>
+        <div id="validate">
+            <button id="validateButton">Filter</button>
+        </div>
+    </div>
+    <div id="mainPanel">
+        <div class="loader"></div>
+        <div id="chart"></div>
+    </div>
+</main>
+
 </body>
+<script>
+    let loader = document.querySelector('.loader')
+    let chart = document.querySelector('#chart')
+    let filters = document.querySelector('#filters')
+    filters.style.height = window.innerHeight*.9+'px'
+    chart.style.display = 'none'
+    let heightLoader =  document.body.offsetWidth * .25 + 'px'
+    loader.style.height = heightLoader
+    loader.style.width = heightLoader
+</script>
 </html>
