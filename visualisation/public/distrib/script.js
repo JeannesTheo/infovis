@@ -39,8 +39,7 @@ onload = function (){
         const x = d3.scaleBand()
             .range([ 0, width ])
             .domain(filteredData.map(d => d.Genre))
-            .padding(0.2);
-        console.log(x)
+            // .padding(0.2);
         svg.append("g")
             .attr("transform", `translate(0, ${height})`)
             .call(d3.axisBottom(x))
@@ -51,7 +50,7 @@ onload = function (){
 // Add Y axis
         const y = d3.scaleLinear()
             .domain([0, 50000])
-            .range([ height, 0]);
+            .range([0,height]);
         svg.append("g")
             .call(d3.axisLeft(y));
 
@@ -62,8 +61,8 @@ onload = function (){
             .append("rect")
             .attr("x", d => x(d.Genre))
             .attr("y", d => y(d.Value))
-            .attr("width", x.bandwidth())
-            .attr("height", d => height - y(d.Value))
+            .attr("width", 50)
+            .attr("height", d => y(d.Value))
             .attr("fill", "#69b3a2")
 
     })

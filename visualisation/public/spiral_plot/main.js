@@ -1,4 +1,63 @@
 import {getHeight} from '../utils.js';
+import {
+    fillSlider, setToggleAccessible, controlFromSlider, controlToSlider, controlFromInput, controlToInput
+} from './slider.js';
+
+let barChartHeight = getHeight() * .20;
+let deltaYear = 30;
+let dataBarChart = []
+let centerPointSaved = null
+document.querySelector('#barchart').addEventListener('wheel', function (e) {
+    if (e.deltaY < 0) {
+        deltaYear = Math.max(1, deltaYear - 1)
+    } else {
+        deltaYear = Math.min(30, deltaYear + 1)
+    }
+    showBarChart(dataBarChart, centerPointSaved)
+})
+let startYear;
+let endYear;
+let realHeight = getHeight() - document.querySelector('header').offsetHeight - barChartHeight * 1.1
+let height = realHeight * .97
+let margins = realHeight * .03
+let width = realHeight
+let start = 0
+let end = 2.25
+let numSpirals = 3
+let color = d3.scaleOrdinal().range( // We keep a 5 colors palette, we have a 7 colors palette but it's less readable
+    ["#825600", "#707aff", "#b2e800", // "#ec00b7",
+        "#009039", "#0073e0", "#01d9ab"]);
+// ["#ffa6ff", "#877000", "#007de7", "#00cf9b", "#66009f"]);
+let theta = function (r) {
+    return numSpirals * Math.PI * r;
+};
+let distanceFromCenter = 40
+let r = d3.min([width, height]) / 2 - distanceFromCenter;
+
+let radius = d3.scaleLinear()
+    .domain([start, end])
+    .range([distanceFromCenter, r]);
+
+let svg = d3.select("#chart").append("svg")
+    .attr("width", width)
+    .attr("height", height + margins)
+    .append("g")
+    .attr("transform", "translate(" + width / 2 + ',' + ((height / 2) + margins) + ")");
+
+let points = d3.range(start, end + 0.001, (end - start) / 1000);
+
+let spiral = d3.radialLine()
+    .curve(d3.curveCardinal)
+    .angle(theta)
+    .radius(radius);
+
+let path = svg.append("path")
+    .datum(points)
+    .attr("id", "spiral")
+    .attr("d", spiral)
+    .style("fill", "none")
+    .style("stroke", "steelblue");
+let spiralLength = path.node().getTotalLength()
 
 function getIndexGenres(someData) {
     let tmp = new Set()
@@ -41,14 +100,14 @@ function addLabels(someData) {
         .text(d => d.date)
         // place text along spiral
         .attr("xlink:href", "#spiral")
-        .style("fill", "grey")
+        .style("fill", "black")
         .attr("startOffset", function (d) {
             return ((d.linePer / spiralLength) * 100) + "%";
         })
 }
 
-function addTooltips() {
-    let tooltip = d3.select("#chart")
+function addTooltips(divOrigine, divTooltip) {
+    let tooltip = d3.select("#" + divTooltip)
         .append('div')
         .attr('class', 'tooltip');
 
@@ -61,9 +120,8 @@ function addTooltips() {
     tooltip.append('div')
         .attr('class', 'explicit');
 
-    svg.selectAll("rect")
+    divOrigine.selectAll("rect")
         .on('mouseover', function (d) {
-            console.log(d)
             let explicitLyrics = d.explicit === 'True' ? "Yes" : "No"
             tooltip.select('.date').html("Date: <b>" + d.date + "</b>");
             tooltip.select('.value').html("Songs: <b>" + Math.round(d.value * 100) / 100 + "<b>");
@@ -80,8 +138,13 @@ function addTooltips() {
 
         })
         .on('mousemove', function (d) {
-            tooltip.style('top', (d3.event.layerY + 10) + 'px')
-                .style('left', (d3.event.layerX - 25) + 'px');
+            if (divTooltip === 'barchart') {
+                tooltip.style('top', (d3.event.layerY - 80) + 'px')
+                    .style('left', (d3.event.layerX + 25) + 'px');
+            } else {
+                tooltip.style('top', (d3.event.layerY + 10) + 'px')
+                    .style('left', (d3.event.layerX - 25) + 'px');
+            }
         })
         .on('mouseout', function (d) {
             d3.selectAll("rect")
@@ -91,7 +154,7 @@ function addTooltips() {
                 .style("stroke", function (d) {
                     if (d.explicit === 'True') return '#ff0000'; else return 'none';
                 })
-                .style("stroke-width", ".8px");
+                .style("stroke-width", ".7px");
 
             tooltip.style('display', 'none');
             tooltip.style('opacity', 0);
@@ -111,13 +174,11 @@ function setBars(someData) {
         .range([0, spiralLength]);
     let maximumCount = 0
     someData.map(d => d.value).forEach(d => maximumCount = Math.max(maximumCount, d))
-    console.log(maximumCount)
     // yScale for the bar height
     let yScale = d3.scaleLog()
         .clamp(true)
-        .domain([1, maximumCount])
-        .range([0, (r / (numSpirals + 1)) - 10]); // Sert a fit la hauteur des barres, pas vraiment de règle ?
-    console.log(r, numSpirals)
+        .domain([1, maximumCount]) // quand on fait pas confiance a d3js ca marche mieux :p
+        .range([0, (r / (numSpirals + 1)) - 10]);
     svg.selectAll("rect")
         .data(someData)
         .enter()
@@ -148,52 +209,112 @@ function setBars(someData) {
             // }else
             return color(d.date);
         }).style("stroke", function (d) {
-            if (d.explicit === 'True') return '#ff0000'; else return 'none';
-         })
-        .style("stroke-width", ".8px")
+        if (d.explicit === 'True') return '#ff0000'; else return 'none';
+    })
+        .style("stroke-width", ".7px")
         .attr("transform", function (d) {
             return "rotate(" + d.a + "," + d.x + "," + d.y + ")"; // rotate the bar
-        });
+        }).on('click', function (d) {
+        showBarChart(someData, d)
+    })
 }
 
-let realHeight = getHeight() - document.querySelector('header').offsetHeight
-let height = realHeight * .90
-let margins = realHeight * .08
-let width = realHeight
-let start = 0
-let end = 2.25
-let numSpirals = 3
-let color = d3.scaleOrdinal(d3.schemeCategory10);
-let theta = function (r) {
-    return numSpirals * Math.PI * r;
-};
-let distanceFromCenter = 40
-let r = d3.min([width, height]) / 2 - distanceFromCenter;
+function showBarChart(someData, centerPoint = null) {
+    if (someData.length === 0) {
+        someData = dataBarChart
+        centerPoint = centerPointSaved
+    }
 
-let radius = d3.scaleLinear()
-    .domain([start, end])
-    .range([distanceFromCenter, r]);
+    if (centerPoint !== null) {
+        centerPointSaved = centerPoint
+        someData = someData.filter(d => d.date <= parseInt(centerPoint.date) + deltaYear && d.date >= centerPoint.date - deltaYear)
+    }
+    let barChart = document.querySelector('#barchart')
+    barChart.innerHTML = ''
+    let height = barChartHeight * .83
+    let svgBarChart = d3.select("#barchart").append("svg")
+        .attr("width", barChart.clientWidth)
+        .attr("height", barChartHeight)
+        .append("g")
+    let length = someData.length
+    let coeff = length > 900 ? 1.5 : length > 500 ? 2 : length > 200 ? 3 : 5
+    let barWidth = (barChart.offsetWidth / (length * coeff));
+    let genres_map = getIndexGenres(someData);
+    let domainSpiral = d3.extent(someData, function (d) {
+        return parseInt(d.date) + genres_map[d.group];
+    })
+    let xScale = d3.scaleLinear()
+        .domain(domainSpiral)
+        .range([0, barChart.clientWidth])
+    let maximumCount = 0
+    someData.map(d => d.value).forEach(d => maximumCount = Math.max(maximumCount, d))
+    // yScale for the bar height
+    let yScale = d3.scaleLog()
+        .clamp(true)
+        .domain([1, maximumCount]) // quand on fait pas confiance a d3js ca marche mieux :p
+        .range([height, 0]);
+    svgBarChart.selectAll("rect")
+        .data(someData)
+        .enter()
+        .append("rect")
+        .attr("x", function (d) {
+            return xScale(parseInt(d.date) + genres_map[d.group])
+        })
+        .attr("y", function (d) {
+            return yScale(d.value)
+        })
+        .attr("width", function (d) {
+            return barWidth;
+        })
+        .attr("height", function (d) {
+            return (height - yScale(d.value));
+        })
+        .style("fill", function (d) {
+            return color(d.date);
+        }).style("stroke", function (d) {
+        if (d.explicit === 'True') return '#ff0000'; else return 'none';
+    }).style("stroke-width", ".8px")
+        .on('click', function (d) {
+            showBarChart(someData, d)
+        })
+    if (deltaYear<6) {
+        svgBarChart.append("g").selectAll("text")
+            .data(someData)
+            .enter()
+            .append("text")
+            .attr("x", function (d) {
+                return xScale(parseInt(d.date) + genres_map[d.group])
+            })
+            .attr("y", function (d) {
+                return yScale(d.value)
+            })
+            .attr("dy", 10)
+            // .attr("dx", ".5em")
+            .style("text-anchor", "end")
+            .style("font", "10px arial")
+            .text(d => d.group)
+            // .attr("rotate", "45deg")
+        // .attr("transform", "translate(-10,0)rotate(-45)")
+        // .style("text-anchor", "end")
+    }
 
-let svg = d3.select("#chart").append("svg")
-    .attr("width", width)
-    .attr("height", height + margins)
-    .append("g")
-    .attr("transform", "translate(" + width / 2 + ',' + ((height / 2) + margins) + ")");
 
-let points = d3.range(start, end + 0.001, (end - start) / 1000);
+    addTooltips(svgBarChart, 'barchart')
 
-let spiral = d3.radialLine()
-    .curve(d3.curveCardinal)
-    .angle(theta)
-    .radius(radius);
+    const xAxis = d3.scaleBand()
+        .domain(someData.map(d => d.date).sort())
+        .range([0, barChart.clientWidth])
 
-let path = svg.append("path")
-    .datum(points)
-    .attr("id", "spiral")
-    .attr("d", spiral)
-    .style("fill", "none")
-    .style("stroke", "steelblue");
-let spiralLength = path.node().getTotalLength()
+    svgBarChart.append("g")
+        .attr("transform", `translate(0, ${height})`)
+        .call(d3.axisBottom(xAxis))
+        .selectAll("text")
+        .attr("transform", "translate(-10,0)rotate(-45)")
+        .style("text-anchor", "end")
+        .style("font", "10px arial")
+
+}
+
 window.onload = function () {
     let genresDisplayed
 
@@ -210,9 +331,11 @@ window.onload = function () {
                 });
             }
         })
+        showBarChart(someData)
+        dataBarChart = someData
         setBars(someData);
         addLabels(someData);
-        addTooltips();
+        addTooltips(svg, 'chart');
         switchLoader()
     }
 
@@ -240,6 +363,8 @@ window.onload = function () {
         })
     }
 
+    document.querySelector('#barchart').style.height = barChartHeight + 'px'
+
     d3.csv('spiral_plot_count.csv').then(function (data) {
         document.querySelector('#filters').style.height = getHeight() * .85 + 'px'
         createGenresFilters(getListGenres(data))
@@ -259,8 +384,6 @@ window.onload = function () {
         displayData(data, genresDisplayed, 0, 2023, true, true);
     });
 }
-let startYear;
-let endYear;
 
 function switchLoader() {
     let loader = document.querySelector('.loader')
@@ -274,87 +397,11 @@ function switchLoader() {
     }
 }
 
-
-function controlFromInput(fromSlider, fromInput, toInput, controlSlider) {
-    const [from, to] = getParsed(fromInput, toInput);
-    fillSlider(fromInput, toInput, '#C6C6C6', '#61A3BA', controlSlider);
-    if (from > to) {
-        fromSlider.value = to;
-        fromInput.value = to;
-    } else {
-        fromSlider.value = from;
-    }
-}
-
-function controlToInput(toSlider, fromInput, toInput, controlSlider) {
-    const [from, to] = getParsed(fromInput, toInput);
-    fillSlider(fromInput, toInput, '#C6C6C6', '#61A3BA', controlSlider);
-    setToggleAccessible(toInput);
-    if (from <= to) {
-        toSlider.value = to;
-        toInput.value = to;
-    } else {
-        toInput.value = from;
-    }
-}
-
-function controlFromSlider(fromSlider, toSlider, fromInput) {
-    const [from, to] = getParsed(fromSlider, toSlider);
-    fillSlider(fromSlider, toSlider, '#C6C6C6', '#61A3BA', toSlider);
-    if (from > to) {
-        fromSlider.value = to;
-        fromInput.value = to;
-    } else {
-        fromInput.value = from;
-    }
-}
-
-function controlToSlider(fromSlider, toSlider, toInput) {
-    const [from, to] = getParsed(fromSlider, toSlider);
-    fillSlider(fromSlider, toSlider, '#C6C6C6', '#61A3BA', toSlider);
-    setToggleAccessible(toSlider);
-    if (from <= to) {
-        toSlider.value = to;
-        toInput.value = to;
-    } else {
-        toInput.value = from;
-        toSlider.value = from;
-    }
-}
-
-function getParsed(currentFrom, currentTo) {
-    const from = parseInt(currentFrom.value, 10);
-    const to = parseInt(currentTo.value, 10);
-    return [from, to];
-}
-
-function fillSlider(from, to, sliderColor, rangeColor, controlSlider) {
-    const rangeDistance = to.max - to.min;
-    const fromPosition = from.value - to.min;
-    const toPosition = to.value - to.min;
-    controlSlider.style.background = `linear-gradient(
-      to right,
-      ${sliderColor} 0%,
-      ${sliderColor} ${(fromPosition) / (rangeDistance) * 100}%,
-      ${rangeColor} ${((fromPosition) / (rangeDistance)) * 100}%,
-      ${rangeColor} ${(toPosition) / (rangeDistance) * 100}%, 
-      ${sliderColor} ${(toPosition) / (rangeDistance) * 100}%, 
-      ${sliderColor} 100%)`;
-}
-
-function setToggleAccessible(currentTarget) {
-    const toSlider = document.querySelector('#toSlider');
-    if (Number(currentTarget.value) <= 0) {
-        toSlider.style.zIndex = 2;
-    } else {
-        toSlider.style.zIndex = 0;
-    }
-}
-
 const fromSlider = document.querySelector('#fromSlider');
 const toSlider = document.querySelector('#toSlider');
 const fromInput = document.querySelector('#fromInput');
 const toInput = document.querySelector('#toInput');
+
 fillSlider(fromSlider, toSlider, '#C6C6C6', '#61A3BA', toSlider);
 setToggleAccessible(toSlider);
 
