@@ -1,4 +1,3 @@
-import {lightenDarkenColor,getWidth,getHeight} from '../utils.js';
 function updateOnClick(e, path, total) {
     e.target.style.stroke = "#acd75a";
     path.setAttribute("stroke", "#acd75a");
@@ -31,6 +30,22 @@ function updateOnClick(e, path, total) {
     });
 }
 
+function lightenDarkenColor(col,amt) {
+    if (col[0]==="#") {
+        col = col.slice(1);
+    }
+
+    let num = parseInt(col,16);
+    let f=function(n) { return n>255?255:(Math.max(0,n)) }
+    let h=function(n) { return n.length<2?"0"+n:n }
+
+    let r = h(f((num >> 16) + amt).toString(16));
+    let b = h(f(((num >> 8) & 0x00FF) + amt).toString(16));
+    let g = h(f((num & 0x0000FF) + amt).toString(16));
+
+    return "#" + r + b + g;
+}
+
 function resetOnClick() {
     backOnClick()
     Array.from(document.getElementsByTagName('path')).forEach(function (evt) {
@@ -40,7 +55,7 @@ function resetOnClick() {
 
 function backOnClick() {
     Array.from(document.getElementsByTagName('path')).forEach(function (evt) {
-        if (evt.textContent.includes("True")) {
+        if (evt.textContent.startsWith("True")) {
             evt.setAttribute("stroke", "#f34343");
             evt.style.stroke = "#f34343";
         } else {
@@ -134,13 +149,30 @@ const graph = (data) => {
     return {nodes, links};
 };
 
+function getWidth() {
+    return Math.max(
+        document.body.scrollWidth,
+        document.documentElement.scrollWidth,
+        document.body.offsetWidth,
+        document.documentElement.offsetWidth,
+        document.documentElement.clientWidth
+    );
+}
+
+function nameSort(a, b) {
+    if(a.names < b.names) return 1;
+    if(a.names > b.names) return -1;
+    return 0;
+}
+
 const chart = (graph) => {
     const width = getWidth();
-    const height = getHeight();
+    // const width = screen.width * 0.9;
+    // const height = getHeight();
+    const height = screen.height * 0.8;
     console.log(width,'*',height);
     const sankey = d3.sankey()
-        .nodeSort(null)
-        .linkSort(null)
+        .linkSort(nameSort)
         .nodeWidth(4)
         .nodePadding(20)
         .extent([[0, 0], [width, height-20]]);
@@ -151,7 +183,7 @@ const chart = (graph) => {
         .attr("viewBox", [0, 0, width, height])
         // .attr("viewBox", [width*.1, 0, width*.8, height*.7])
         .attr("width", width)
-        .attr("style", "max-width: 86%; height: auto; margin-top: 2em;");
+        .attr("style", "max-width: 90%; margin-top: 2em;");
 
 
     const {nodes, links} = sankey({
@@ -183,7 +215,8 @@ const chart = (graph) => {
         .text(d => `${d.names.join(" → ")}\n${d.value.toLocaleString()}`);
 
     svg.append("g")
-        .style("font", "1em sans-serif")
+        .attr("font-size", "1em")
+        .attr("font-weight", "bold")
         .selectAll("text")
         .data(nodes)
         .join("text")
@@ -193,7 +226,7 @@ const chart = (graph) => {
         .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
         .text(d => d.name)
         .append("tspan")
-        .attr("fill-opacity", 0.7)
+        .attr("fill-opacity", 1)
         .text(d => ` ${d.value.toLocaleString()}`);
 
     document.getElementById("loading").style.display = "none";

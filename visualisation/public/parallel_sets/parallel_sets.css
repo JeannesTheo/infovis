@@ -23,13 +23,15 @@
 }
 
 #filter-button{
-    width: 5em;
-    height: 2em;
+    padding: 0px;
+    width:5em;
+    height:2em;
     background-color: #93e0d8;
     color: #000000;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    text-align: center;
 }
 
 #header-container{
@@ -40,12 +42,18 @@
     justify-content: space-between;
 }
 
+#general-container{
+    visibility: hidden;
+}
+
 #loading{
     visibility: visible;
     display: flex;
     justify-content: center;
 }
-
+#loading-img{
+    margin-top: 1em;
+}
 #loading-text{
     border:2px solid #ddd;
     background:#fff;
