@@ -7,6 +7,7 @@ let barChartHeight = getHeight() * .20;
 let deltaYear = 30;
 let dataBarChart = []
 let centerPointSaved = null
+let dataSaved = []
 document.querySelector('#barchart').addEventListener('wheel', function (e) {
     if (e.deltaY < 0) {
         deltaYear = Math.max(1, deltaYear - 1)
@@ -106,7 +107,7 @@ function addLabels(someData) {
         })
 }
 
-function addTooltips(divOrigine, divTooltip, someData) {
+function addTooltips(divOrigine, divTooltip, someData,width= 0) {
     let tooltip = d3.select("#" + divTooltip)
         .append('div')
         .attr('class', 'tooltip');
@@ -124,18 +125,17 @@ function addTooltips(divOrigine, divTooltip, someData) {
 
     divOrigine.selectAll("rect")
         .on('mouseover', function (d) {
-            console.log(d)
-            console.log(someData.length)
-            let total = someData.filter(e => {
+            let total = dataSaved.filter(e => {
                 return e.date === d.date && e.group === d.group
             }).map(e => parseInt(e.value)).reduce((a, b) => a + b, 0)
+            console.log(total,dataSaved.length)
             let explicitLyrics = d.explicit === 'True' ? "Yes" : "No"
             let textExplicit = d.explicit === 'True' ? "Explicit" : "Implicit"
-            tooltip.select('.date').html("Date: <b>" + d.date + "</b>");
+            tooltip.select('.date').html("Year: <b>" + d.date + "</b>");
             tooltip.select('.value').html("Songs: <b>" + d.value + "<b>");
             tooltip.select('.genre').html("Genre: <b>" + d.group + "<b>");
             tooltip.select('.explicit').html("Explicit Lyrics: <b>" + explicitLyrics + "<b>");
-            tooltip.select('.repartition').html(textExplicit+" Proportion: <b> " + Math.round((parseInt(d.value) / total)*100) + "%<b>");
+            tooltip.select('.repartition').html(textExplicit+" Proportion: <b> " + Math.round((parseInt(d.value) / total)*100) + "% ("+d.value+'/'+total+")<b>");
 
             d3.select(this)
                 .style("fill", "#FFFFFF")
@@ -163,7 +163,17 @@ function addTooltips(divOrigine, divTooltip, someData) {
                 .style("stroke", function (d) {
                     if (d.explicit === 'True') return '#ff0000'; else return 'none';
                 })
-                .style("stroke-width", ".7px");
+                .style("stroke-width", function (d) {
+                    if (d.explicit === 'True')
+                        return '1px';
+                    else
+                        return '0'
+                })
+                .style("opacity", function (d){
+                    if (d.explicit === 'True') return .6; else return 1;
+                }).style("stroke", function (d) {
+                if (d.explicit === 'True') return '#ff0000'; else return 'none';
+            })
 
             tooltip.style('display', 'none');
             tooltip.style('opacity', 0);
@@ -213,19 +223,17 @@ function setBars(someData) {
             return yScale(d.value);
         })
         .style("fill", function (d) {
-            // if (d.explicit === 'True') {
-            //     return '#ff0000'
-            // }else
             return color(d.date);
         }).style("stroke", function (d) {
         if (d.explicit === 'True') return '#ff0000'; else return 'none';
     })
-        .style("stroke-width", ".7px")
+        .style("stroke-width",".7px")
         .attr("transform", function (d) {
             return "rotate(" + d.a + "," + d.x + "," + d.y + ")"; // rotate the bar
         }).on('click', function (d) {
         showBarChart(someData, d)
     })
+    return barWidth
 }
 
 function showBarChart(someData, centerPoint = null) {
@@ -288,12 +296,15 @@ function showBarChart(someData, centerPoint = null) {
             return color(d.date);
         }).style("stroke", function (d) {
         if (d.explicit === 'True') return '#ff0000'; else return 'none';
-    }).style("stroke-width", ".8px")
+    }).style("stroke-width", "1px")
+        .style("opacity", function (d){
+            if (d.explicit === 'True') return .6; else return 1;
+        })
         .on('click', function (d) {
             showBarChart(someData, d)
         })
 
-    addTooltips(svgBarChart, 'barchart', dataBarChart)
+    addTooltips(svgBarChart, 'barchart', dataBarChart,barWidth)
 
     const xAxis = d3.scaleBand()
         .domain(someData.map(d => d.date).sort())
@@ -313,7 +324,6 @@ window.onload = function () {
     let genresDisplayed
 
     function displayData(data, genres, startYear, endYear, explicit, implicit) {
-        // switchLoader()
         svg.selectAll("rect").remove()
         svg.selectAll("text").remove()
         svg.selectAll("tooltip").remove()
@@ -327,9 +337,9 @@ window.onload = function () {
         })
         showBarChart(someData)
         dataBarChart = someData
-        setBars(someData);
+        let width = setBars(someData);
         addLabels(someData);
-        addTooltips(svg, 'chart', someData);
+        addTooltips(svg, 'chart', someData,width);
         switchLoader()
     }
 
@@ -362,6 +372,7 @@ window.onload = function () {
     d3.csv('spiral_plot_count.csv').then(function (data) {
         document.querySelector('#filters').style.height = getHeight() * .85 + 'px'
         createGenresFilters(getListGenres(data))
+            dataSaved = data.map(d => ({'date': d.year, 'group': d.genre, 'value': d.count}))
         document.querySelector('#explicitCheckbox')
         document.querySelector('#implicitCheckbox')
         document.querySelector('#validateButton').addEventListener('click', function (e) {
