@@ -106,7 +106,7 @@ function addLabels(someData) {
         })
 }
 
-function addTooltips(divOrigine, divTooltip) {
+function addTooltips(divOrigine, divTooltip, someData) {
     let tooltip = d3.select("#" + divTooltip)
         .append('div')
         .attr('class', 'tooltip');
@@ -119,14 +119,23 @@ function addTooltips(divOrigine, divTooltip) {
         .attr('class', 'genre');
     tooltip.append('div')
         .attr('class', 'explicit');
+    tooltip.append('div')
+        .attr('class', 'repartition');
 
     divOrigine.selectAll("rect")
         .on('mouseover', function (d) {
+            console.log(d)
+            console.log(someData.length)
+            let total = someData.filter(e => {
+                return e.date === d.date && e.group === d.group
+            }).map(e => parseInt(e.value)).reduce((a, b) => a + b, 0)
             let explicitLyrics = d.explicit === 'True' ? "Yes" : "No"
+            let textExplicit = d.explicit === 'True' ? "Explicit" : "Implicit"
             tooltip.select('.date').html("Date: <b>" + d.date + "</b>");
-            tooltip.select('.value').html("Songs: <b>" + Math.round(d.value * 100) / 100 + "<b>");
+            tooltip.select('.value').html("Songs: <b>" + d.value + "<b>");
             tooltip.select('.genre').html("Genre: <b>" + d.group + "<b>");
             tooltip.select('.explicit').html("Explicit Lyrics: <b>" + explicitLyrics + "<b>");
+            tooltip.select('.repartition').html(textExplicit+" Proportion: <b> " + Math.round((parseInt(d.value) / total)*100) + "%<b>");
 
             d3.select(this)
                 .style("fill", "#FFFFFF")
@@ -233,6 +242,10 @@ function showBarChart(someData, centerPoint = null) {
     someData = someData.filter(d => d.date <= parseInt(centerPoint.date) + deltaYear && d.date >= centerPoint.date - deltaYear)
     let barChart = document.querySelector('#barchart')
     barChart.innerHTML = ''
+    let icon = document.createElement('img')
+    icon.src = 'spiral.png'
+    icon.id ='scroll'
+    barChart.appendChild(icon)
     let height = barChartHeight * .83
     let svgBarChart = d3.select("#barchart").append("svg")
         .attr("width", barChart.clientWidth)
@@ -279,8 +292,8 @@ function showBarChart(someData, centerPoint = null) {
         .on('click', function (d) {
             showBarChart(someData, d)
         })
-    
-    addTooltips(svgBarChart, 'barchart')
+
+    addTooltips(svgBarChart, 'barchart', dataBarChart)
 
     const xAxis = d3.scaleBand()
         .domain(someData.map(d => d.date).sort())
@@ -316,7 +329,7 @@ window.onload = function () {
         dataBarChart = someData
         setBars(someData);
         addLabels(someData);
-        addTooltips(svg, 'chart');
+        addTooltips(svg, 'chart', someData);
         switchLoader()
     }
 
