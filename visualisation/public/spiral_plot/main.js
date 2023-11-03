@@ -224,11 +224,13 @@ function showBarChart(someData, centerPoint = null) {
         someData = dataBarChart
         centerPoint = centerPointSaved
     }
-
-    if (centerPoint !== null) {
+    if (centerPoint === null) {
+        centerPoint = someData[Math.floor(someData.length / 2)]
         centerPointSaved = centerPoint
-        someData = someData.filter(d => d.date <= parseInt(centerPoint.date) + deltaYear && d.date >= centerPoint.date - deltaYear)
     }
+
+    centerPointSaved = centerPoint
+    someData = someData.filter(d => d.date <= parseInt(centerPoint.date) + deltaYear && d.date >= centerPoint.date - deltaYear)
     let barChart = document.querySelector('#barchart')
     barChart.innerHTML = ''
     let height = barChartHeight * .83
@@ -277,28 +279,7 @@ function showBarChart(someData, centerPoint = null) {
         .on('click', function (d) {
             showBarChart(someData, d)
         })
-    if (deltaYear<6) {
-        svgBarChart.append("g").selectAll("text")
-            .data(someData)
-            .enter()
-            .append("text")
-            .attr("x", function (d) {
-                return xScale(parseInt(d.date) + genres_map[d.group])
-            })
-            .attr("y", function (d) {
-                return yScale(d.value)
-            })
-            .attr("dy", 10)
-            // .attr("dx", ".5em")
-            .style("text-anchor", "end")
-            .style("font", "10px arial")
-            .text(d => d.group)
-            // .attr("rotate", "45deg")
-        // .attr("transform", "translate(-10,0)rotate(-45)")
-        // .style("text-anchor", "end")
-    }
-
-
+    
     addTooltips(svgBarChart, 'barchart')
 
     const xAxis = d3.scaleBand()

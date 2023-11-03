@@ -15,21 +15,21 @@ onload = function (){
 // Parse the Data
     d3.csv("occurences_genres_grouped_clean.csv").then ( function(data) {
 
-    let filteredData = data.filter(d => d.Value > 1000);
+        let filteredData = data.filter(d => d.Value > 1000);
 
-    // Sélectionnez le corps de la page
-    const body = document.querySelector('body');
+        // Sélectionnez le corps de la page
+        const body = document.querySelector('body');
 
-    // Créez un élément de paragraphe (p)
-    const paragraphe = document.createElement('p');
+        // Créez un élément de paragraphe (p)
+        const paragraphe = document.createElement('p');
 
-    // Définissez le texte à afficher dans le paragraphe
-    paragraphe.textContent = `Les genres affichés représentent ${((d3.sum(filteredData,d => d.Value)/d3.sum(data,d => d.Value)) * 100).toFixed(2)}% du dataset`;
+        // Définissez le texte à afficher dans le paragraphe
+        paragraphe.textContent = `Les genres affichés représentent ${((d3.sum(filteredData,d => d.Value)/d3.sum(data,d => d.Value)) * 100).toFixed(2)}% du dataset`;
 
-    // Ajoutez le paragraphe au corps de la page
-    body.appendChild(paragraphe);
+        // Ajoutez le paragraphe au corps de la page
+        body.appendChild(paragraphe);
 
-    console.log(d3.sum(filteredData,d => d.Value)/d3.sum(data,d => d.Value))
+        console.log(d3.sum(filteredData,d => d.Value)/d3.sum(data,d => d.Value))
 // sort data
         filteredData.sort(function(b, a) {
             return a.Value - b.Value;
@@ -39,7 +39,8 @@ onload = function (){
         const x = d3.scaleBand()
             .range([ 0, width ])
             .domain(filteredData.map(d => d.Genre))
-            // .padding(0.2);
+            .padding(0.2);
+        console.log(x)
         svg.append("g")
             .attr("transform", `translate(0, ${height})`)
             .call(d3.axisBottom(x))
@@ -50,7 +51,7 @@ onload = function (){
 // Add Y axis
         const y = d3.scaleLinear()
             .domain([0, 50000])
-            .range([0,height]);
+            .range([ height, 0]);
         svg.append("g")
             .call(d3.axisLeft(y));
 
@@ -61,8 +62,8 @@ onload = function (){
             .append("rect")
             .attr("x", d => x(d.Genre))
             .attr("y", d => y(d.Value))
-            .attr("width", 50)
-            .attr("height", d => y(d.Value))
+            .attr("width", x.bandwidth())
+            .attr("height", d => height - y(d.Value))
             .attr("fill", "#69b3a2")
 
     })
