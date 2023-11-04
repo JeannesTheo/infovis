@@ -167,8 +167,6 @@ function nameSort(a, b) {
 
 const chart = (graph) => {
     const width = getWidth();
-    // const width = screen.width * 0.9;
-    // const height = getHeight();
     const height = screen.height * 0.8;
     console.log(width,'*',height);
     const sankey = d3.sankey()
@@ -277,5 +275,7 @@ function updateChart(remove = true) {
                 }
             });
         });
+    }).catch(function () {
+        alert("Le fichier "+csvFilePath+" n'a pas été trouvé. Veuillez le placer dans le dossier spiral_plot puis réessayer.")
     });
 }

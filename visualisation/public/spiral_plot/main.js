@@ -25,10 +25,22 @@ let width = realHeight
 let start = 0
 let end = 2.25
 let numSpirals = 3
-let color = d3.scaleOrdinal().range( // We keep a 5 colors palette, we have a 7 colors palette but it's less readable
-    ["#825600", "#707aff", "#b2e800", // "#ec00b7",
-        "#009039", "#0073e0", "#01d9ab"]);
+let color = d3.scaleOrdinal().range(
+    // ["#825600", "#707aff", "#b2e800", // "#ec00b7",
+    //     "#009039", "#0073e0", "#01d9ab"]);
 // ["#ffa6ff", "#877000", "#007de7", "#00cf9b", "#66009f"]);
+//     ["#ffc3eb",
+//         "#54a94f",
+//         "#b878f6",
+//         "#afa58a",
+//         "#c5f49e",
+//         "#2cb9d4"]);
+    ["#ff74be",
+        "#01aa2c",
+        "#b772ff",
+        "#cdb739",
+        "#9ff85f",
+        "#00ffff"]);
 let theta = function (r) {
     return numSpirals * Math.PI * r;
 };
@@ -107,7 +119,7 @@ function addLabels(someData) {
         })
 }
 
-function addTooltips(divOrigine, divTooltip, someData,width= 0) {
+function addTooltips(divOrigine, divTooltip) {
     let tooltip = d3.select("#" + divTooltip)
         .append('div')
         .attr('class', 'tooltip');
@@ -128,14 +140,13 @@ function addTooltips(divOrigine, divTooltip, someData,width= 0) {
             let total = dataSaved.filter(e => {
                 return e.date === d.date && e.group === d.group
             }).map(e => parseInt(e.value)).reduce((a, b) => a + b, 0)
-            console.log(total,dataSaved.length)
             let explicitLyrics = d.explicit === 'True' ? "Yes" : "No"
             let textExplicit = d.explicit === 'True' ? "Explicit" : "Implicit"
             tooltip.select('.date').html("Year: <b>" + d.date + "</b>");
             tooltip.select('.value').html("Songs: <b>" + d.value + "<b>");
             tooltip.select('.genre').html("Genre: <b>" + d.group + "<b>");
             tooltip.select('.explicit').html("Explicit Lyrics: <b>" + explicitLyrics + "<b>");
-            tooltip.select('.repartition').html(textExplicit+" Proportion: <b> " + Math.round((parseInt(d.value) / total)*100) + "% ("+d.value+'/'+total+")<b>");
+            tooltip.select('.repartition').html(textExplicit + " Proportion: <b> " + Math.round((parseInt(d.value) / total) * 100) + "% (" + d.value + '/' + total + ")<b>");
 
             d3.select(this)
                 .style("fill", "#FFFFFF")
@@ -146,7 +157,7 @@ function addTooltips(divOrigine, divTooltip, someData,width= 0) {
             tooltip.style('opacity', 2);
 
         })
-        .on('mousemove', function (d) {
+        .on('mousemove', function () {
             if (divTooltip === 'barchart') {
                 tooltip.style('top', (d3.event.layerY - 80) + 'px')
                     .style('left', (d3.event.layerX + 25) + 'px');
@@ -155,7 +166,7 @@ function addTooltips(divOrigine, divTooltip, someData,width= 0) {
                     .style('left', (d3.event.layerX - 25) + 'px');
             }
         })
-        .on('mouseout', function (d) {
+        .on('mouseout', function () {
             d3.selectAll("rect")
                 .style("fill", function (d) {
                     return color(d.date);
@@ -164,12 +175,9 @@ function addTooltips(divOrigine, divTooltip, someData,width= 0) {
                     if (d.explicit === 'True') return '#ff0000'; else return 'none';
                 })
                 .style("stroke-width", function (d) {
-                    if (d.explicit === 'True')
-                        return '1px';
-                    else
-                        return '0'
+                    if (d.explicit === 'True') return '1px'; else return '0'
                 })
-                .style("opacity", function (d){
+                .style("opacity", function (d) {
                     if (d.explicit === 'True') return .6; else return 1;
                 }).style("stroke", function (d) {
                 if (d.explicit === 'True') return '#ff0000'; else return 'none';
@@ -227,7 +235,7 @@ function setBars(someData) {
         }).style("stroke", function (d) {
         if (d.explicit === 'True') return '#ff0000'; else return 'none';
     })
-        .style("stroke-width",".7px")
+        .style("stroke-width", ".7px")
         .attr("transform", function (d) {
             return "rotate(" + d.a + "," + d.x + "," + d.y + ")"; // rotate the bar
         }).on('click', function (d) {
@@ -252,7 +260,7 @@ function showBarChart(someData, centerPoint = null) {
     barChart.innerHTML = ''
     let icon = document.createElement('img')
     icon.src = 'spiral.png'
-    icon.id ='scroll'
+    icon.id = 'scroll'
     barChart.appendChild(icon)
     let height = barChartHeight * .83
     let svgBarChart = d3.select("#barchart").append("svg")
@@ -286,7 +294,7 @@ function showBarChart(someData, centerPoint = null) {
         .attr("y", function (d) {
             return yScale(d.value)
         })
-        .attr("width", function (d) {
+        .attr("width", function () {
             return barWidth;
         })
         .attr("height", function (d) {
@@ -297,14 +305,14 @@ function showBarChart(someData, centerPoint = null) {
         }).style("stroke", function (d) {
         if (d.explicit === 'True') return '#ff0000'; else return 'none';
     }).style("stroke-width", "1px")
-        .style("opacity", function (d){
+        .style("opacity", function (d) {
             if (d.explicit === 'True') return .6; else return 1;
         })
         .on('click', function (d) {
             showBarChart(someData, d)
         })
 
-    addTooltips(svgBarChart, 'barchart', dataBarChart,barWidth)
+    addTooltips(svgBarChart, 'barchart')
 
     const xAxis = d3.scaleBand()
         .domain(someData.map(d => d.date).sort())
@@ -337,9 +345,9 @@ window.onload = function () {
         })
         showBarChart(someData)
         dataBarChart = someData
-        let width = setBars(someData);
+        setBars(someData);
         addLabels(someData);
-        addTooltips(svg, 'chart', someData,width);
+        addTooltips(svg, 'chart');
         switchLoader()
     }
 
@@ -368,26 +376,27 @@ window.onload = function () {
     }
 
     document.querySelector('#barchart').style.height = barChartHeight + 'px'
-
-    d3.csv('spiral_plot_count.csv').then(function (data) {
-        document.querySelector('#filters').style.height = getHeight() * .85 + 'px'
-        createGenresFilters(getListGenres(data))
+        d3.csv('spiral_plot_count.csv').then(function (data) {
+            document.querySelector('#filters').style.height = getHeight() * .85 + 'px'
+            createGenresFilters(getListGenres(data))
             dataSaved = data.map(d => ({'date': d.year, 'group': d.genre, 'value': d.count}))
-        document.querySelector('#explicitCheckbox')
-        document.querySelector('#implicitCheckbox')
-        document.querySelector('#validateButton').addEventListener('click', function (e) {
-            e.preventDefault()
-            switchLoader()
-            setTimeout(function () {
-                startYear = parseInt(document.querySelector('#fromInput').value)
-                endYear = parseInt(document.querySelector('#toInput').value)
-                let explicit = document.querySelector('#explicitCheckbox').checked
-                let implicit = document.querySelector('#implicitCheckbox').checked
-                displayData(data, genresDisplayed, startYear, endYear, explicit, implicit)
-            }, 10)
+            document.querySelector('#explicitCheckbox')
+            document.querySelector('#implicitCheckbox')
+            document.querySelector('#validateButton').addEventListener('click', function (e) {
+                e.preventDefault()
+                switchLoader()
+                setTimeout(function () {
+                    startYear = parseInt(document.querySelector('#fromInput').value)
+                    endYear = parseInt(document.querySelector('#toInput').value)
+                    let explicit = document.querySelector('#explicitCheckbox').checked
+                    let implicit = document.querySelector('#implicitCheckbox').checked
+                    displayData(data, genresDisplayed, startYear, endYear, explicit, implicit)
+                }, 10)
+            });
+            displayData(data, genresDisplayed, 0, 2023, true, true);
+        }).catch(function () {
+            alert("Le fichier spiral_plot_count.csv n'a pas été trouvé. Veuillez le placer dans le dossier spiral_plot puis réessayer.")
         });
-        displayData(data, genresDisplayed, 0, 2023, true, true);
-    });
 }
 
 function switchLoader() {

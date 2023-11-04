@@ -47,7 +47,7 @@ get_year <- function(x, y) {
     )
 
   }
-  return(switch(as.character(year), "0" = NA, "2100" = 2010, "4018" = 2018, year))
+  return(switch(as.character(year), "0" = NA, "2100" = 2010, "4018" = 2018,"2007-10-00"=2007,"2039"=2019,"2099"=2019,"2079"=2019,"2025"=2015, year))
 }
 
 merging_dates <- function (input_file,save_file){

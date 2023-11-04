@@ -13,7 +13,8 @@ onload = function (){
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
 // Parse the Data
-    d3.csv("occurences_genres_grouped_clean.csv").then ( function(data) {
+    let file = 'occurences_genres_grouped_clean.csv'
+    d3.csv(file).then ( function(data) {
 
         let filteredData = data.filter(d => d.Value > 1000);
 
@@ -66,5 +67,7 @@ onload = function (){
             .attr("height", d => height - y(d.Value))
             .attr("fill", "#69b3a2")
 
-    })
+    }).catch(function(){
+       alert("Le fichier "+file+" n'a pas été trouvé. Veuillez le placer dans le dossier spiral_plot puis réessayer.");
+    });
 }

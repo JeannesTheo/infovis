@@ -17,9 +17,7 @@ count_data <- function(input_file, save_file) {
   # write.csv(data, save_file, row.names = FALSE)
   setwd(base_dir)
 }
-clean_year <- function(x) {
-  switch(as.character(x), "2007-10-00"=2007,"2039"=2019,"2099"=2019,"2079"=2019,"2025"=2015, x)
-}
+
 setwd('data')
 data <- read.csv('songs_cleaned_date_genre.csv', header = TRUE, sep = ',', fill = TRUE, dec = '.')
 data <- subset(data, select = c("genre", "explicitLyrics", "year"))
@@ -38,7 +36,6 @@ for (i in seq_len(nrow(data_cleaned))) {
   }
 }
 data_cleaned <- subset(data_cleaned,year>1961 & year<2018)
-data_cleaned$year <- mapply(clean_year, data_cleaned$year)
 write.csv(data_cleaned, 'spiral_plot.csv', row.names = FALSE)
 setwd(base_dir)
 count_data('spiral_plot.csv', 'spiral_plot_count.csv')
