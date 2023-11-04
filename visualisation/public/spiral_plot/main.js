@@ -10,7 +10,7 @@ let centerPointSaved = null
 let dataSaved = []
 document.querySelector('#barchart').addEventListener('wheel', function (e) {
     if (e.deltaY < 0) {
-        deltaYear = Math.max(1, deltaYear - 1)
+        deltaYear = Math.max(0, deltaYear - 1)
     } else {
         deltaYear = Math.min(30, deltaYear + 1)
     }
@@ -25,8 +25,7 @@ let width = realHeight
 let start = 0
 let end = 2.25
 let numSpirals = 3
-let color = d3.scaleOrdinal().range(
-    // ["#825600", "#707aff", "#b2e800", // "#ec00b7",
+let color = d3.scaleOrdinal().range(// ["#825600", "#707aff", "#b2e800", // "#ec00b7",
     //     "#009039", "#0073e0", "#01d9ab"]);
 // ["#ffa6ff", "#877000", "#007de7", "#00cf9b", "#66009f"]);
 //     ["#ffc3eb",
@@ -35,12 +34,7 @@ let color = d3.scaleOrdinal().range(
 //         "#afa58a",
 //         "#c5f49e",
 //         "#2cb9d4"]);
-    ["#ff74be",
-        "#01aa2c",
-        "#b772ff",
-        "#cdb739",
-        "#9ff85f",
-        "#00ffff"]);
+    ["#ff74be", "#01aa2c", "#b772ff", "#cdb739", "#9ff85f", "#00ffff"]);
 let theta = function (r) {
     return numSpirals * Math.PI * r;
 };
@@ -175,10 +169,18 @@ function addTooltips(divOrigine, divTooltip) {
                     if (d.explicit === 'True') return '#ff0000'; else return 'none';
                 })
                 .style("stroke-width", function (d) {
-                    if (d.explicit === 'True') return '1px'; else return '0'
+                    if (divTooltip === 'barchart') {
+                        if (d.explicit === 'True')
+                            return '1.25px';
+                        else
+                            return '0'
+                    } else if (d.explicit === 'True')
+                        return '.7px';
+                    else
+                        return '0'
                 })
                 .style("opacity", function (d) {
-                    if (d.explicit === 'True') return .6; else return 1;
+                    if (d.explicit === 'True') return .8; else return 1;
                 }).style("stroke", function (d) {
                 if (d.explicit === 'True') return '#ff0000'; else return 'none';
             })
@@ -304,9 +306,9 @@ function showBarChart(someData, centerPoint = null) {
             return color(d.date);
         }).style("stroke", function (d) {
         if (d.explicit === 'True') return '#ff0000'; else return 'none';
-    }).style("stroke-width", "1px")
+    }).style("stroke-width", "1.25px")
         .style("opacity", function (d) {
-            if (d.explicit === 'True') return .6; else return 1;
+            if (d.explicit === 'True') return .8; else return 1;
         })
         .on('click', function (d) {
             showBarChart(someData, d)
@@ -376,27 +378,27 @@ window.onload = function () {
     }
 
     document.querySelector('#barchart').style.height = barChartHeight + 'px'
-        d3.csv('spiral_plot_count.csv').then(function (data) {
-            document.querySelector('#filters').style.height = getHeight() * .85 + 'px'
-            createGenresFilters(getListGenres(data))
-            dataSaved = data.map(d => ({'date': d.year, 'group': d.genre, 'value': d.count}))
-            document.querySelector('#explicitCheckbox')
-            document.querySelector('#implicitCheckbox')
-            document.querySelector('#validateButton').addEventListener('click', function (e) {
-                e.preventDefault()
-                switchLoader()
-                setTimeout(function () {
-                    startYear = parseInt(document.querySelector('#fromInput').value)
-                    endYear = parseInt(document.querySelector('#toInput').value)
-                    let explicit = document.querySelector('#explicitCheckbox').checked
-                    let implicit = document.querySelector('#implicitCheckbox').checked
-                    displayData(data, genresDisplayed, startYear, endYear, explicit, implicit)
-                }, 10)
-            });
-            displayData(data, genresDisplayed, 0, 2023, true, true);
-        }).catch(function () {
-            alert("Le fichier spiral_plot_count.csv n'a pas été trouvé. Veuillez le placer dans le dossier spiral_plot puis réessayer.")
+    d3.csv('spiral_plot_count.csv').then(function (data) {
+        document.querySelector('#filters').style.height = getHeight() * .85 + 'px'
+        createGenresFilters(getListGenres(data))
+        dataSaved = data.map(d => ({'date': d.year, 'group': d.genre, 'value': d.count}))
+        document.querySelector('#explicitCheckbox')
+        document.querySelector('#implicitCheckbox')
+        document.querySelector('#validateButton').addEventListener('click', function (e) {
+            e.preventDefault()
+            switchLoader()
+            setTimeout(function () {
+                startYear = parseInt(document.querySelector('#fromInput').value)
+                endYear = parseInt(document.querySelector('#toInput').value)
+                let explicit = document.querySelector('#explicitCheckbox').checked
+                let implicit = document.querySelector('#implicitCheckbox').checked
+                displayData(data, genresDisplayed, startYear, endYear, explicit, implicit)
+            }, 10)
         });
+        displayData(data, genresDisplayed, 0, 2023, true, true);
+    }).catch(function () {
+        alert("Le fichier spiral_plot_count.csv n'a pas été trouvé. Veuillez le placer dans le dossier spiral_plot puis réessayer.")
+    });
 }
 
 function switchLoader() {
