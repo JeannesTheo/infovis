@@ -3,7 +3,7 @@ import {
     fillSlider, setToggleAccessible, controlFromSlider, controlToSlider, controlFromInput, controlToInput
 } from './slider.js';
 
-let barChartHeight = getHeight() * .20;
+let barChartHeight = getHeight() * .25;
 let deltaYear = 30;
 let dataBarChart = []
 let centerPointSaved = null
