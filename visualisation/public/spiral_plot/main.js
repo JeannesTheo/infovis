@@ -397,7 +397,7 @@ window.onload = function () {
         });
         displayData(data, genresDisplayed, 0, 2023, true, true);
     }).catch(function () {
-        alert("Le fichier a_spiral_plot_count.csv n'a pas été trouvé. Veuillez le placer dans le dossier spiral_plot puis réessayer.")
+        alert("Le fichier spiral_plot_count.csv n'a pas été trouvé. Veuillez le placer dans le dossier spiral_plot puis réessayer.")
     });
 }
 
