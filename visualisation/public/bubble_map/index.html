@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>TP InfoVis</title>
+    <!-- import the d3 library -->
+    <script type="text/javascript" src="d3.v5.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script defer src="script.js"></script>
+    <!-- style sheet -->
+</head>
+<body>
+<div class="full-container">
+    <div class="left-container">
+        <svg id="my_dataviz"></svg>
+    </div>
+    <div class="right-container">
+        <div class="top-right-container">
+            <div class="checkbox-group">
+                <label for="checkbox1">Remove US:</label>
+                <input type="checkbox" id="checkbox1">
+            </div>
+            <div class="checkbox-group">
+                <label for="combo1">Decade:</label>
+                <select id="combo1">
+                    <option value="All">All</option>
+                    <option value="2020">2020</option>
+                    <option value="2010">2010</option>
+                    <option value="2000">2000</option>
+                    <option value="1990">1990</option>
+                    <option value="Before 1990">Before 1990</option>
+                    <!-- Add more options as needed -->
+                </select>
+            </div>
+            <button id="validate-button">Validate</button>
+        </div>
+        <div class="bottom-right-container">
+            <div class="selected">
+                <span id="countryName1">Country Name:</span> <br><br><br>
+                <span id="volumeOfSongs1">Volume of songs:</span> <br><br><br>
+                <span id="volumeOfExplicitSongs1">Volume of explicit songs:</span> <br><br><br>
+                <span id="volumeOfNonExplicitSongs1">Volume of non-explicit songs:</span> <br><br><br>
+                <span id="percentExplicitSongs1">% of explicit songs:</span> <br><br><br>
+            </div>
+            <div class="selected">
+                <span id="countryName2">Country Name:</span> <br><br><br>
+                <span id="volumeOfSongs2">Volume of songs:</span> <br><br><br>
+                <span id="volumeOfExplicitSongs2">Volume of explicit songs:</span> <br><br><br>
+                <span id="volumeOfNonExplicitSongs2">Volume of non-explicit songs:</span> <br><br><br>
+                <span id="percentExplicitSongs2">% of explicit songs:</span> <br><br><br>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

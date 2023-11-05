@@ -1,0 +1,70 @@
+/* Style the body and provide some spacing */
+body {
+    margin: 0;
+}
+
+.selected span {
+    font-family: 'Your Font Name', sans-serif;
+    font-size: 22px;
+}
+
+.selected{
+    width: 100%;
+    height: 50%;
+    border: 2px solid #ccc;
+    flex-direction: column;
+}
+
+.myCircles:hover{
+    stroke: black;
+    stroke-width: 200px;
+}
+
+/* Style the main container div */
+.full-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+.right-container {
+    display: flex;
+    height: 100vh;
+    width : 50%;
+    flex-direction: column;
+}
+
+/* Style the top-right container */
+.top-right-container {
+    min-width: 500px; /* Define a minimum width for the top-right container */
+    padding: 20px;
+    background-color: #f1f1f1;
+    border: 1px solid #ccc;
+    display: flex;
+    max-height : 50px;
+    flex-direction: row; /* Change the flex direction to column */
+}
+
+/* Style the bottom-right container to take all the remaining space */
+.bottom-right-container {
+    min-height : 850px;
+    background-color: #f1f1f1;
+    display: flex;
+    flex-direction: column;
+}
+
+.left-container{
+    width: 60%;
+}
+
+/* Style the checkbox group */
+.checkbox-group {
+    flex-grow: 1; /* Allow elements to grow and fill available space */
+    margin-right: 10px; /* Add spacing between elements */
+}
+
+/* Style the Validate button */
+#validate-button {
+    flex-grow: 1; /* Allow button to grow and fill available space */
+}
+
