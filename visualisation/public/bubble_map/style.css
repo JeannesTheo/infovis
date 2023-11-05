@@ -68,3 +68,31 @@ body {
     flex-grow: 1; /* Allow button to grow and fill available space */
 }
 
+header > button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 10px;
+    cursor: pointer;
+    background-color: #007BFF;
+    color: #FFFFDD;
+    border: none;
+    border-radius: 5px;
+}
+
+header > button:hover {
+    background-color: #0056b3;
+}
+
+header > button:disabled {
+    background-color: #999999;
+    cursor: not-allowed;
+}
+
+header {
+    background-color: #333; /* Set the background color */
+    color: #FFFFDD; /* Set the text color */
+    /*padding: 10px; !* Add some padding for spacing *!*/
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Space items evenly */
+    align-items: center; /* Align items vertically */
+}

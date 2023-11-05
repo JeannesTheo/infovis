@@ -9,15 +9,37 @@
     <button onclick="window.location.href='index.html'">Menu</button>
     <button onclick="window.location.href='spiral_plot/index.html'">Spiral Plot</button>
     <button onclick="window.location.href='parallel_sets/index.html'">Parallel Sets</button>
-    <button onclick="window.location.href='distrib/index.html'">Distribution des Genres</button>
-    <button onclick="window.location.href='page4.html'">Bouton 4</button>
+    <button onclick="window.location.href='population_pyramide/main.html'">Population Pyramid</button>
+    <button onclick="window.location.href='bubble_map/index.html'">Bubble Map</button>
 </header>
 
-<main>
-    <h1>Bienvenu sur nos visualisations</h1>
+<main style="display: flex; flex-direction: column; align-items: center">
+    <h1>Bienvenue sur nos visualisations</h1>
     <p>Vous pouvez cliquer sur les boutons dans le header pour alterner entre les visualisations</p>
     <p>Le GitHub contenant le code et le rapport est <a href="https://github.com/JeannesTheo/infovis">ici : https://github.com/JeannesTheo/infovis</a></p>
-    <p>Les fichiers csv utilisées sont disponible sur un google <a href="https://drive.google.com/drive/folders/1KMQ-7-d675h42WQPgVOmDHN4jC1Lqb27?usp=sharing">drive : https://drive.google.com/drive/folders/1KMQ-7-d675h42WQPgVOmDHN4jC1Lqb27?usp=sharing</a></p>
+    <p>Les fichiers csv utilisés sont disponible sur un google <a href="https://drive.google.com/drive/folders/1KMQ-7-d675h42WQPgVOmDHN4jC1Lqb27?usp=sharing">drive : https://drive.google.com/drive/folders/1KMQ-7-d675h42WQPgVOmDHN4jC1Lqb27?usp=sharing</a></p>
+
+    <div>
+        <h2>Nos visualisations</h2>
+        <ul>
+            <li><button onclick="window.location.href='spiral_plot/index.html'">Spiral Plot</button>               </li>
+            <li>
+                <button onclick="window.location.href='parallel_sets/index.html'">Parallel Sets</button>
+            </li>
+            <li>
+                <button onclick="window.location.href='population_pyramide/main.html'">Population Pyramid</button>
+            </li>
+            <li>
+                <button onclick="window.location.href='page4.html'">Bouton 4</button>
+            </li>
+        </ul>
+    </div>
+
+
+    <div>
+        <p>Histogramme des genres utilisés pour representer la distribution des genres pendant le traitement des données</p>
+        <button style="background: rgb(128,128,128)" onclick="window.location.href='distrib/index.html'">Distribution des genres</button>
+    </div>
 </main>
 
 </body>

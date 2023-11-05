@@ -7,7 +7,7 @@ const port = 3000
 // les fichiers statiques: html, css, js, images etc.
 app.use(express.static('public'))
 
-app.get('/spiral_plot/', (req, res) => {
+app.get('/', (req, res) => {
   res.render('index')
 })
 
