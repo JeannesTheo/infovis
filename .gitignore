@@ -1,11 +1,5 @@
 /visualisation/.idea/
 /visualisation/node_modules/
 /dataHandling/data/
-/.idea/.gitignore
-/.idea/git.iml
-/.idea/misc.xml
-/.idea/modules.xml
-/.idea/rAvailablePackageCache.xml
-/.idea/rGraphicsSettings.xml
-/.idea/rSettings.xml
-/.idea/vcs.xml
+/.idea
+*.csv

@@ -1,35 +1,38 @@
-* {
-    padding: 0;
+/* style.css */
+
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    /*margin: 50px;*/
     margin: 0;
-    font-family: Helvetica, sans-serif;
-    /*font-family: Sans Mono, monospace, sans-serif;*/
+    padding: 0;
 }
 
-.axis path,
-.axis line {
-    fill: none;
-    stroke: black;
-    shape-rendering: crispEdges;
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 10px;
+    cursor: pointer;
+    background-color: #007BFF;
+    color: #FFFFDD;
+    border: none;
+    border-radius: 5px;
 }
 
-.axis text {
-    font-family: sans-serif;
-    font-size: 11px;
+button:hover {
+    background-color: #0056b3;
 }
 
-.links line {
-    stroke: #999;
-    stroke-opacity: 0.6;
+button:disabled {
+    background-color: #999999;
+    cursor: not-allowed;
 }
 
-.nodes circle {
-    stroke: #fff;
-    stroke-width: 1.5px;
-}
-
-#scene {
-    background-image: url("./map.jpeg");
-    background-size: cover;
-    width: 960px;
-    height: 810px;
+header {
+    background-color: #333; /* Set the background color */
+    color: #FFFFDD; /* Set the text color */
+    /*padding: 10px; !* Add some padding for spacing *!*/
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Space items evenly */
+    align-items: center; /* Align items vertically */
 }

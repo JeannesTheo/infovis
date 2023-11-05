@@ -1,0 +1,115 @@
+#details {
+    display: none;
+    width: 300px; /* Set the width of the card */
+    margin: 0 auto; /* Center the card horizontally */
+    padding: 20px; /* Add some padding for spacing */
+    border: 1px solid #ccc; /* Add a border */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #f0f0f0; /* Background color */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Drop shadow */
+    flex-direction: row; /* Center text within the card */
+}
+
+#detail {
+    font-size: 18px; /* Adjust font size */
+    color: #333; /* Text color */
+    margin-top: 3em;
+}
+
+#title{
+    display: flex;
+    justify-content: center;
+    font: bold 1.5em Arial;
+}
+
+#filter-button{
+    padding: 0px;
+    width:5em;
+    height:2em;
+    background-color: #93e0d8;
+    color: #000000;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
+#header-container{
+    width: 90%;
+    margin: 0 auto;
+    margin-top: 1em;
+    display: flex;
+    justify-content: space-between;
+}
+
+#general-container{
+    visibility: hidden;
+}
+
+#loading{
+    visibility: visible;
+    display: flex;
+    justify-content: center;
+}
+#loading-img{
+    margin-top: 1em;
+}
+#loading-text{
+    border:2px solid #ddd;
+    background:#fff;
+    box-shadow:0 5px 20px 2px rgba(0,0,0,0.1);
+    font: 2.5em Arial;
+    width: fit-content;
+    padding: 0.5em;
+    margin: 1em;
+}
+
+.container {
+    margin-top:10px;
+    margin-bottom: 2em;
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    column-gap:15px;
+    row-gap: 25px;
+    /*max-width:650px;*/
+}
+.form-element {
+    position:relative;
+    width:5em;
+    height:1.5em;
+}
+.form-element input {
+    display:none;
+}
+.form-element label {
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    height:100%;
+    cursor:pointer;
+    border:2px solid #ddd;
+    background:#fff;
+    box-shadow:0 5px 20px 2px rgba(0,0,0,0.1);
+    text-align:center;
+    transition:all 200ms ease-in-out;
+    border-radius:5px;
+}
+.form-element .icon {
+    margin-top:10px;
+    font-size:30px;
+    color:#555;
+    transition:all 200ms ease-in-out;
+}
+.form-element .title {
+    font-size:15px;
+    color: #000000;
+    padding:5px 0;
+    transition:all 200ms ease-in-out;
+}
+
+.form-element input:checked + label {
+    border:3px solid #93e0d8;
+    background: #b1c4c1;
+}

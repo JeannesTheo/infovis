@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-sankey/0.12.3/d3-sankey.min.js"
+            integrity="sha512-KK15oKpabNDaLpWinMtNfTqy/V7pzlc2FRG174PfASes7RRx6TAsua8HJdRTKo8+BLvPBKNIkL7kXWcz5HoqqA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script type="text/javascript" src="../lib/d3js.org_d3.v5.js"></script>
+    <script type="module" src="parallel_set.js" defer></script>
+    <link rel="stylesheet" type="text/css" href="parallel_sets.css">
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <title>Parallels Sets</title>
+</head>
+<body>
+<header>
+    <button onclick="window.location.href='../index.html'">Menu</button>
+    <button onclick="window.location.href='../spiral_plot/index.html'">Spiral Plot</button>
+    <button onclick="window.location.href='../parallel_sets/index.html'">Parallel Sets</button>
+    <button onclick="window.location.href='../distrib/index.html'">Distribution des Genres</button>
+    <button onclick="window.location.href='page4.html'">Bouton 4</button>
+</header>
+<div id="loading">
+    <div id="loading-text">We are processing the data<br><img id="loading-img" src="loading.gif"></div>
+
+</div>
+<div id="general-container">
+    <div id="title">
+        <div>
+            <span>Choisissez les genres :</span>
+            <span><button id="filter-button">Filter</button></span>
+        </div>
+    </div>
+    <div id="genre-selector" class="container"></div>
+    <div id="details">
+        <p id="detail"></p>
+    </div>
+    <div id="header-container">
+        <div class="header">Explicit Lyrics</div>
+        <div class="header">Music genre</div>
+        <div class="header">Artist Type</div>
+        <div class="header">Artist Gender</div>
+        <div class="header">Explicit Album</div>
+    </div>
+    <div id="chart-container"></div>
+</div>
+
+</body>
+</html>
