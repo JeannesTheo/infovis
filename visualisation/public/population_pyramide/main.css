@@ -26,6 +26,38 @@ svg {
 .bar.highlighted {
 
     /* Couleur de remplissage au survol */
-  opacity: 0.8;     /* Opacité réduite au survol */
+  opacity: 0.5;     /* Opacité réduite au survol */
   cursor: pointer;  /* Curseur de type main au survol */
+}
+
+#info {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  max-width: 300px;
+  transition: all 0.3s ease;
+}
+
+#info h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+#info p {
+  margin: 5px 0;
+  color: #666;
+}
+
+#info p:first-child {
+  font-weight: bold;
+}
+
+#info:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  background-color: #f9f9f9;
 }
