@@ -55,6 +55,9 @@ function loadData(removeUS, selectedDecade) {
         if(removeUS){
             data = data.filter(item => item.country !== "US");
         }
+        data.sort(function (a, b) {
+          return parseInt(b.TotalVolume) - parseInt(a.TotalVolume);
+        })
 
         const maxTotalValue = d3.max(data, (d) => +d.TotalVolume);
         const TransformedMax = transformValue(maxTotalValue)

@@ -1,6 +1,7 @@
 /* Style the body and provide some spacing */
 body {
     margin: 0;
+    overflow: hidden;
 }
 
 .selected span {

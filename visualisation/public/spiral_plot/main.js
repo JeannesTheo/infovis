@@ -34,7 +34,7 @@ let color = d3.scaleOrdinal().range(// ["#825600", "#707aff", "#b2e800", // "#ec
 //         "#afa58a",
 //         "#c5f49e",
 //         "#2cb9d4"]);
-    ["#ff74be", "#01aa2c", "#b772ff", "#cdb739", "#9ff85f", "#00ffff"]);
+    ["#FFBEBE", "#01aa2c", "#b772ff", "#cdb739", "#9ff85f", "#00ffff"]);
 let theta = function (r) {
     return numSpirals * Math.PI * r;
 };
@@ -381,6 +381,10 @@ window.onload = function () {
     d3.csv('spiral_plot_count.csv').then(function (data) {
         document.querySelector('#filters').style.height = getHeight() * .85 + 'px'
         createGenresFilters(getListGenres(data))
+        data.sort(function (a, b) {
+            if (a.genre < b.genre) return -1; else if (a.genre > b.genre) return 1;
+            return b.count - a.count
+        });
         dataSaved = data.map(d => ({'date': d.year, 'group': d.genre, 'value': d.count}))
         document.querySelector('#explicitCheckbox')
         document.querySelector('#implicitCheckbox')
