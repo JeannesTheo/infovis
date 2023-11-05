@@ -5,7 +5,7 @@ const port = 3000
 
 // Cette ligne indique le répertoire qui contient
 // les fichiers statiques: html, css, js, images etc.
-app.use(express.static('public'))
+app.use(express.static('public/bubble_map'))
 
 app.get('/', (req, res) => {
   res.render('index')

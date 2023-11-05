@@ -9,7 +9,7 @@ data <- read.csv("data/final_data.csv")
 
 # Group the data by country, latitude, and longitude
 grouped_data <- data %>%
-  group_by(country, latitude, longitude, explicitLyrics)
+  group_by(decade, country, latitude, longitude, explicitLyrics)
 
 volume_count <- grouped_data %>%
   summarize(volume = n())
@@ -18,14 +18,15 @@ explicit_data <- volume_count %>% filter(explicitLyrics == 'True')
 non_explicit_data <- volume_count %>% filter(explicitLyrics == 'False')
 
 # Merge the explicit and non-explicit data into one line per group
-result <- merge(explicit_data, non_explicit_data, by = c("country", "latitude", "longitude"), all = TRUE)
+result <- merge(explicit_data, non_explicit_data, by = c("decade","country", "latitude", "longitude"), all = TRUE)
+
 
 # Replace NA values with 0
 result[is.na(result)] <- 0
 
 # Rename columns
-result <- result[, -c(4, 6)] # remove useless columns
-colnames(result) <- c("country", "latitude", "longitude", "ExplicitVolume", "NonExplicitVolume")
+result <- result[, -c(5, 7)] # remove useless columns
+colnames(result) <- c("decade", "country", "latitude", "longitude", "ExplicitVolume", "NonExplicitVolume")
 
 result <- result %>%
   mutate(
@@ -43,4 +44,4 @@ result_with_names <- left_join(result, new_data_selected, by = "country")
 
 # Print the result
 print(result_with_names)
-write.csv(result_with_names, "data/all_data.csv", row.names = FALSE)
+write.csv(result_with_names, "data/all_decade_data.csv", row.names = FALSE)

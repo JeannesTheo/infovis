@@ -41,13 +41,14 @@ const colorScale = d3.scaleSequential(d3.interpolateWarm)
 function loadData(removeUS, selectedDecade) {
 
     // Now, you can use the 'name' variable as needed in your data loading process
-    console.log("Name: " + selectedDecade);
+    name = "decade_" + selectedDecade + ".csv";
+    console.log(name);
 // Load external data
     Promise.all([
         // change which json is loaded (filters)
 
         d3.json("countries.geojson"),
-        d3.csv("all_data.csv"),
+        d3.csv(name),
     ]).then((files) => {
         let geojson = files[0];
         let data = files[1];
@@ -64,18 +65,18 @@ function loadData(removeUS, selectedDecade) {
 
         // Three function that change the tooltip when user hover / move / leave a cell
         var mouseover = function (d) {
-            countryName1.textContent = "Country Name: " + d.name;
-            volumeOfSongs1.textContent = "Volume of songs: " + d.TotalVolume;
-            volumeOfExplicitSongs1.textContent = "Volume of explicit songs: " + d.ExplicitVolume;
-            volumeOfNonExplicitSongs1.textContent = "Volume of non-explicit songs: " + d.NonExplicitVolume;
-            percentExplicitSongs1.textContent = "% of explicit songs: " + parseFloat(d.Ratio).toFixed(2) + "%";
+            countryName1.innerHTML = "Country Name: <b>" + d.name + "</b>";
+            volumeOfSongs1.innerHTML = "Volume of songs: <b>" + d.TotalVolume + "</b>";
+            volumeOfExplicitSongs1.innerHTML = "Volume of explicit songs: <b>" + d.ExplicitVolume + "</b>";
+            volumeOfNonExplicitSongs1.innerHTML = "Volume of non-explicit songs: <b>" + d.NonExplicitVolume + "</b>";
+            percentExplicitSongs1.innerHTML = "% of explicit songs: <b>" + parseFloat(d.Ratio).toFixed(2) + "%" + "</b>";
         }
         var onClick = function (d) {
-            countryName2.textContent = "Country Name: " + d.name;
-            volumeOfSongs2.textContent = "Volume of songs: " + d.TotalVolume;
-            volumeOfExplicitSongs2.textContent = "Volume of explicit songs: " + d.ExplicitVolume;
-            volumeOfNonExplicitSongs2.textContent = "Volume of non-explicit songs: " + d.NonExplicitVolume;
-            percentExplicitSongs2.textContent = "% of explicit songs: " + parseFloat(d.Ratio).toFixed(2) + "%";
+            countryName2.innerHTML = "Country Name: <b>" + d.name + "</b>";
+            volumeOfSongs2.innerHTML = "Volume of songs: <b>" + d.TotalVolume + "</b>";
+            volumeOfExplicitSongs2.innerHTML = "Volume of explicit songs: <b>" + d.ExplicitVolume + "</b>";
+            volumeOfNonExplicitSongs2.innerHTML = "Volume of non-explicit songs: <b>" + d.NonExplicitVolume + "</b>";
+            percentExplicitSongs2.innerHTML = "% of explicit songs: <b>" + parseFloat(d.Ratio).toFixed(2) + "%" + "</b>";
         }
 
         // Fit the projection to the size of the SVG container
@@ -233,4 +234,4 @@ document.getElementById("validate-button").addEventListener("click", function ()
     loadData(removeUSCheckbox, selectedDecade);
 });
 
-loadData(false);
+loadData(false, "all");
