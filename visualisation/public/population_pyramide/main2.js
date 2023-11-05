@@ -57,7 +57,7 @@ var svg = d3.select('body').append('svg')
 svg.append('text')
   .attr('class', 'graph-title')
   .attr('x', (w / 2)-120)
-  .attr('y', 00) // Adjust the Y position as needed
+  .attr('y', 0) // Adjust the Y position as needed
   .text('Music Data Visualization by explicit or non-explicit'); // Your desired title
 
 // find the maximum data value on either side
